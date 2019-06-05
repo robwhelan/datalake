@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Queue with a redrive policy.
+Parameters:
+  pProjectName:
+    Type: String
+    Description: The lowercase, overall name of the project which will be used for naming and for tagging.
+  pCMKId:
+    Type: String
+    Description: the CMK used to encrypt SqsQueue
+  pQueueName:
+    Type: String
+    Description: some friendly name for the queue
+  pDeadLetterQueueArn:
+    Type: String
+    Description: arn of the dead letter queue for the redrive policy
+  pSqsQueueVisibilityTimeout:
+    Type: Number
+    Description: number of seconds for VisibilityTimeout
+Resources:
+  rSqsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    DependsOn: rSqsQueue
+    Properties:
+      PolicyDocument:
+        Id: !Sub '${pQueueName}-queue-policy'
+        Version: '2012-10-17'
+        Statement:
+          -
+            Sid: Allow-AWS-SendMessage
+            Effect: Allow
+            Principal: '*' #need to change this to limit what can be sent to it
+            Action: 'SQS:*'
+            Resource: !GetAtt rSqsQueue.Arn
+            Condition:
+              ArnLike:
+                aws:SourceArn: 'arn:aws:s3:::*'
+      Queues:
+        - !Ref rSqsQueue
+  rSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: !Ref pCMKId
+      MessageRetentionPeriod: 1209600 #14 days
+      QueueName: !Ref pQueueName
+      RedrivePolicy:
+        deadLetterTargetArn: !Ref pDeadLetterQueueArn
+        maxReceiveCount: 3
+      VisibilityTimeout: !Ref pSqsQueueVisibilityTimeout
+Outputs:
+  rQueueUrl:
+    Value: !Ref rSqsQueue
+  rQueueArn:
+    Value: !GetAtt rSqsQueue.Arn

@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a KMS customer managed CMK.
+Parameters:
+  pProjectName:
+    Type: String
+    Description: The lowercase, overall name of the project which will be used for naming and for tagging.
+  pKeyAdministrator:
+    Type: String
+    Description: ARN of key administrator role.
+  pKeyUser:
+    Type: String
+    Description: ARN of key user role.
+  pKeyDescription:
+    Type: String
+    Description: a description for this key.
+  pKeyAlias:
+    Type: String
+    AllowedPattern: ^[a-zA-Z0-9:/_-]+$
+    ConstraintDescription: the alias must start with 'alias/' and contain no spaces
+Resources:
+  rKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Ref pKeyDescription
+      EnableKeyRotation: true
+      Enabled: true
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: !Sub '${pProjectName}-${pKeyAlias}-key-policy'
+        Statement:
+          -
+            Sid: "Enable an S3 bucket to use this key to generate data keys, and decrypt messages to the SQS queue"
+            Effect: 'Allow'
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - 'kms:GenerateDataKey*'
+              - 'kms:Decrypt'
+            Resource: '*'
+          -
+            Sid: "Enable IAM User Permissions"
+            Effect: "Allow"
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref 'AWS::AccountId'
+                  - ':root'
+            Action: "kms:*"
+            Resource: "*"
+          -
+            Sid: "Allow administration of the key"
+            Effect: "Allow"
+            Principal:
+              AWS: !Ref pKeyAdministrator
+            Action:
+              - "kms:Create*"
+              - "kms:Describe*"
+              - "kms:Enable*"
+              - "kms:List*"
+              - "kms:Put*"
+              - "kms:Update*"
+              - "kms:Revoke*"
+              - "kms:Disable*"
+              - "kms:Get*"
+              - "kms:Delete*"
+              - "kms:ScheduleKeyDeletion"
+              - "kms:CancelKeyDeletion"
+            Resource: "*"
+          -
+            Sid: "Allow use of the key"
+            Effect: "Allow"
+            Principal:
+              AWS: !Ref pKeyUser #also need to give the s3 bucket permission to use it.
+            Action:
+              - "kms:DescribeKey"
+              - "kms:Encrypt"
+              - "kms:Decrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey"
+              - "kms:GenerateDataKeyWithoutPlaintext"
+            Resource: "*"
+      KeyUsage: ENCRYPT_DECRYPT
+      PendingWindowInDays: 30
+  rKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Ref pKeyAlias
+      TargetKeyId: !Ref rKey
+Outputs:
+  rKeyId:
+    Value: !Ref rKey
+  rKeyArn:
+    Value: !GetAtt rKey.Arn
+  rKeyAlias:
+    Value: !Ref rKeyAlias

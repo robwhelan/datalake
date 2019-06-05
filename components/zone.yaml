@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: A processing zone that includes a bucket, CMK, SQS Queue, and a lambda stub.
+Parameters:
+  pDeadLetterQueueArn:
+    Type: String
+    Description: the ARN of the dead letter queue
+  pKeyAdministrator:
+    Type: String
+    Description: ARN of key administrator role.
+  pKeyUser:
+    Type: String
+    Description: ARN of key user role.
+  pProjectName:
+    Type: String
+    Description: The lowercase, overall name of the project which will be used for naming and for tagging.
+  pSqsQueueVisibilityTimeout:
+    Type: Number
+    Description: The visibility timeout for a message in the sqs queue. Pick a higher number if messages will take longer to process.
+    Default: 30
+  pTransitionClass:
+    Type: String
+    Default: GLACIER
+    AllowedValues:
+      - GLACIER
+      - STANDARD_IA
+      - ONEZONE_IA
+      - INTELLIGENT_TIERING
+      - DEEP_ARCHIVE
+    Description: Default transition storage class
+  pTransitionInDays:
+    Type: Number
+    Default: 7
+    Description: Number of days after which an object transitions to a different storage class
+  pZone:
+    Type: String
+    Description: The processing zone of the Datalake.
+    AllowedValues:
+      - drop
+      - raw
+      - refined
+      - curated
+Resources:
+  rCMK:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        pProjectName: !Ref pProjectName
+        pKeyAdministrator: !Ref pKeyAdministrator
+        pKeyUser: !Ref pKeyUser
+        pKeyDescription: !Sub 'Key for encrypting the ${pZone} Zone bucket and its sqs Queue'
+        pKeyAlias: !Sub 'alias/${pProjectName}-${pZone}-zone-cmk'
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/cmk.yaml
+      TimeoutInMinutes: 5
+  rS3Bucket:
+    Type: AWS::S3::Bucket
+    DependsOn: rSqsQueue
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !GetAtt rCMK.Outputs.rKeyId
+      BucketName: !Sub '${pProjectName}-${pZone}-${AWS::AccountId}'
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            Transitions:
+              - StorageClass: !Ref pTransitionClass
+                TransitionInDays: !Ref pTransitionInDays
+      NotificationConfiguration: #publish to an sqs queue on every new event.
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Queue: !GetAtt rSqsQueue.Outputs.rQueueArn
+  rSqsQueue:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rCMK
+    Properties:
+      Parameters:
+        pProjectName: !Ref pProjectName
+        pCMKId: !GetAtt rCMK.Outputs.rKeyId
+        pDeadLetterQueueArn: !Ref pDeadLetterQueueArn
+        pQueueName: !Sub '${pProjectName}-${pZone}-queue'
+        pSqsQueueVisibilityTimeout: 120
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/queue.yaml
+      TimeoutInMinutes: 15
+Outputs:
+  rS3Bucket:
+    Value: !Ref rS3Bucket
+  rSqsQueueUrl:
+    Value: !Ref rSqsQueue
+  rSqsQueueArn:
+    Value: !GetAtt rSqsQueue.Outputs.rQueueArn

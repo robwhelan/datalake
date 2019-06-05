@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Queue with a redrive policy.
+Parameters:
+  pProjectName:
+    Type: String
+    Description: The lowercase, overall name of the project which will be used for naming and for tagging.
+  pQueueName:
+    Type: String
+    Description: some friendly name for the queue
+Resources:
+  rSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
+      QueueName: !Ref pQueueName
+      MessageRetentionPeriod: 1209600 #14 days
+Outputs:
+  rQueueUrl:
+    Value: !Ref rSqsQueue
+  rQueueArn:
+    Value: !GetAtt rSqsQueue.Arn
