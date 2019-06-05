@@ -83,6 +83,20 @@ Resources:
         pSqsQueueVisibilityTimeout: 120
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/queue.yaml
       TimeoutInMinutes: 15
+  rLambda:
+    #condition: not the curated zone, because there is no downstream bucket for curated zone.
+    Type: AWS::CloudFormation::Stack
+    #DependsOn: rCMK
+    Properties:
+      Parameters:
+        pProjectName: !Ref pProjectName
+        pCMKId: !GetAtt rCMK.Outputs.rKeyId
+        pDeadLetterQueueArn: !Ref pDeadLetterQueueArn
+        pQueueName: !Sub '${pProjectName}-${pZone}-queue'
+        pSqsQueueVisibilityTimeout: 120
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/lambda.yaml
+      TimeoutInMinutes: 15
+  #lambda to process stuff off queue.
 Outputs:
   rS3Bucket:
     Value: !Ref rS3Bucket

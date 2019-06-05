@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a KMS customer managed CMK.
+Parameters:
+  pProjectName:
+    Type: String
+    Description: The lowercase, overall name of the project which will be used for naming and for tagging.
+  pKeyAdministrator:
+    Type: String
+    Description: ARN of key administrator role.
+  pKeyUser:
+    Type: String
+    Description: ARN of key user role.
+  pKeyDescription:
+    Type: String
+    Description: a description for this key.
+  pKeyAlias:
+    Type: String
+    AllowedPattern: ^[a-zA-Z0-9:/_-]+$
+    ConstraintDescription: the alias must start with 'alias/' and contain no spaces
+Resources:
+  #build the lambda: use the layer for data science.
+  #env variables?
+  #create an event source mapping.
+  #allow lambda to read from s3 upstream bucket, and downstream bucket.
+  rLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        Code
+      DeadLetterConfig:
+        DeadLetterConfig
+      Description: String
+      Environment:
+        Environment
+      FunctionName: String
+      Handler: String
+      KmsKeyArn: String
+      Layers:
+        - String
+      MemorySize: Integer
+      ReservedConcurrentExecutions: Integer
+      Role: String
+      Runtime: String
+      Tags:
+        - Tag
+      Timeout: Integer
+      TracingConfig:
+        TracingConfig
+      VpcConfig:
+        VpcConfig
