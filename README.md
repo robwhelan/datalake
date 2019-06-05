@@ -1,3 +1,8 @@
+Design Principles
+1. Send only two stacks: 1 for your prod account, 1 for your security account.
+2. Allow for remote updates of the stacks as the architecture evolves.
+3. Self-contained, best-practices roles.
+
 Features
 * As many zones as you want. 4 zones by default.
 * Each zone:

@@ -38,7 +38,7 @@ Resources:
         - arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python36-SciPy1x:2
       MemorySize: 512
       ReservedConcurrentExecutions: 5
-      Role: arn:aws:iam::773548596459:role/lambda_basic_execution
+      Role: arn:aws:iam::773548596459:role/lambda_basic_execution #need to generalize this. Make this as part of the overall IAM policies and pass it to both the key policy and also to this lambda.
       Runtime: python3.6
       Timeout: 3
   rLambdaTrigger:
@@ -47,5 +47,5 @@ Resources:
     Properties:
       BatchSize: 10
       Enabled: true
-      EventSourceArn: pSourceQueueArn
+      EventSourceArn: !Ref pSourceQueueArn
       FunctionName: !GetAtt rLambdaFunction.Arn
