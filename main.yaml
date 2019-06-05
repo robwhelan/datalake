@@ -20,8 +20,9 @@ Resources:
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
+        pDownstreamZone: raw
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/service-role/accountable-SMS-Role
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
@@ -36,7 +37,7 @@ Resources:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/service-role/accountable-SMS-Role
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
@@ -51,7 +52,7 @@ Resources:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/service-role/accountable-SMS-Role
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
@@ -66,7 +67,7 @@ Resources:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/service-role/accountable-SMS-Role
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER

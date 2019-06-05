@@ -4,6 +4,9 @@ Parameters:
   pDeadLetterQueueArn:
     Type: String
     Description: the ARN of the dead letter queue
+  pDownstreamZone:
+    Type: String
+    Description: the next zone after this one
   pKeyAdministrator:
     Type: String
     Description: ARN of key administrator role.
@@ -76,9 +79,9 @@ Resources:
     DependsOn: rCMK
     Properties:
       Parameters:
-        pProjectName: !Ref pProjectName
         pCMKId: !GetAtt rCMK.Outputs.rKeyId
         pDeadLetterQueueArn: !Ref pDeadLetterQueueArn
+        pProjectName: !Ref pProjectName
         pQueueName: !Sub '${pProjectName}-${pZone}-queue'
         pSqsQueueVisibilityTimeout: 120
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/queue.yaml
@@ -86,14 +89,16 @@ Resources:
   rLambda:
     #condition: not the curated zone, because there is no downstream bucket for curated zone.
     Type: AWS::CloudFormation::Stack
-    #DependsOn: rCMK
+    DependsOn: rSqsQueue #because the queue is needed for the event source mapping within this nested stack
     Properties:
       Parameters:
-        pProjectName: !Ref pProjectName
-        pCMKId: !GetAtt rCMK.Outputs.rKeyId
         pDeadLetterQueueArn: !Ref pDeadLetterQueueArn
-        pQueueName: !Sub '${pProjectName}-${pZone}-queue'
-        pSqsQueueVisibilityTimeout: 120
+        pDownstreamBucket: !Sub '${pProjectName}-${pDownstreamZone}-${AWS::AccountId}'
+        pLambdaSourceCodeBucket: datalake-rww
+        pLambdaSourceCodeKey: functions/lambda-python-starter.zip
+        pProjectName: !Ref pProjectName
+        pSourceQueueArn: !GetAtt rSqsQueue.Outputs.rQueueArn
+        pZone: !Ref pZone
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/lambda.yaml
       TimeoutInMinutes: 15
   #lambda to process stuff off queue.
