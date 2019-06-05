@@ -30,51 +30,6 @@ Resources:
         pZone: drop
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
       TimeoutInMinutes: 15
-  rRawZone:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rDeadLetterQueue
-    Properties:
-      Parameters:
-        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pProjectName: !Ref pProjectName
-        pSqsQueueVisibilityTimeout: 120
-        pTransitionClass: GLACIER
-        pTransitionInDays: 7
-        pZone: raw
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
-      TimeoutInMinutes: 15
-  rRefinedZone:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rDeadLetterQueue
-    Properties:
-      Parameters:
-        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pProjectName: !Ref pProjectName
-        pSqsQueueVisibilityTimeout: 120
-        pTransitionClass: GLACIER
-        pTransitionInDays: 7
-        pZone: refined
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
-      TimeoutInMinutes: 15
-  rCuratedZone:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rDeadLetterQueue
-    Properties:
-      Parameters:
-        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pProjectName: !Ref pProjectName
-        pSqsQueueVisibilityTimeout: 120
-        pTransitionClass: GLACIER
-        pTransitionInDays: 7
-        pZone: curated
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
-      TimeoutInMinutes: 15
 
   #vpc
   #config rules

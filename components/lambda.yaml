@@ -26,14 +26,13 @@ Resources:
         S3Bucket: !Ref pLambdaSourceCodeBucket
         S3Key: !Ref pLambdaSourceCodeKey
       DeadLetterConfig:
-        TargetArn: pDeadLetterQueueArn
+        TargetArn: !Ref pDeadLetterQueueArn
       Description: Lambda stub to download a csv and move it into another downstream bucket.
       Environment:
         Variables:
           DOWNSTREAM_BUCKET: !Ref pDownstreamBucket #ensure the DOWNSTREAM_BUCKET exists.
       FunctionName: !Sub '${pProjectName}-lambda-${pZone}'
       Handler: function.lambda_handler
-      KmsKeyArn: String
       Layers:
         - arn:aws:lambda:us-east-1:773548596459:layer:pandas-lambda:1
         - arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python36-SciPy1x:2
