@@ -9,6 +9,11 @@ Features
   1. Bucket
   2. Dedicated customer-managed CMK to encrypt the bucket, event notifications to SQS
   3. Lambda stub to consume the queue
+* ETL:
+  Create one Glue database.
+  Then, create a Crawler and specify the location for the initial data. This will create a table prefixed with the prefix you specify ()
+  (Run the crawler via SQS / lambda after the resource is created? )
+  After the table is created, update the stack with a transformation?
 
 * Dead letter queue to receive failed messages from every zone, and every lambda consuming the queue.
 
