@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ETL infrastructure
+Resources:
+  rGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+          Description: my database
+          #LocationUri: String
+          Name: smalldatabasefortest
