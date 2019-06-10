@@ -8,20 +8,20 @@ Resources:
       DatabaseInput:
           Description: my database
           #LocationUri: String
-          Name: smalldatabasefortest
+          Name: medicare-payments
   rGlueCrawler:
     Type: AWS::Glue::Crawler
     DependsOn: rGlueDatabase
     Properties:
       DatabaseName: !Ref rGlueDatabase
-      Description: Crawls sales data to establish table
-      Name: sales-crawler
+      Description: Crawls medicare data to establish table
+      Name: medicare-payments-crawler
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: 'sales-'
+      TablePrefix: 'medicare-'
       Targets:
         S3Targets:
-          - Path: 's3://bigdatalabsrww/glue-test/'
+          - Path: 's3://bigdatalabsrww/medicare/'
           - Path: 's3://bigdatalabsrww/glue-test-next/'
