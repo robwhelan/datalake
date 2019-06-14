@@ -6,7 +6,7 @@ Design Principles
 5. Glue (PySpark) for ETL with simple transformations.
 6. ETL to be built out after data initially loaded.
 7. Single Glue crawler for all zones, all data. This should be expanded as new data arrives.
-8. Private S3 endpoints from the private subnets (not from the public or data subnets)
+8. Private S3 and DDB endpoints from the private subnets (not from the public or data subnets). Any lambda should run inside the private subnets.
 
 Features
 * As many zones as you want. 4 zones by default.
@@ -34,8 +34,7 @@ Notes
 * Works for one partition in each bucket. If your drop zone will spread to multiple data streams, such as images in one, and clickstream in another, add another SQS queue for notifications, and configure prefixes for each notifications (/images/ and /clickstream/). Then build a completely different lambda to work off the new queue. Modify the lambda to create a key that matches the partition.
 
 TODO
-* VPC
-* Glue
+* Roles
 * Other storage - RDS, Redshift, Elasticsearch
 * Security account & VPC
 * Auditing

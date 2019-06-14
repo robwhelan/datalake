@@ -110,9 +110,6 @@ Resources:
         - !GetAtt rPrivateSubnetB.Outputs.rRouteTable
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
       VpcId: !Ref rVPC
-      Tags:
-        Key: Name
-        Value: datalake-endpoint-for-s3
   rDdbEndpoint:
     Type: AWS::EC2::VPCEndpoint
     DependsOn:
@@ -132,23 +129,20 @@ Resources:
         - !GetAtt rPrivateSubnetB.Outputs.rRouteTable
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
       VpcId: !Ref rVPC
-      Tags:
-        Key: Name
-        Value: datalake-endpoint-for-ddb
 Outputs:
   oPublicSubnetA:
-    Value: rPublicSubnetA.Outputs.rSubnet
+    Value: !GetAtt rPublicSubnetA.Outputs.rSubnet
   oPublicSubnetB:
-    Value: rPublicSubnetB.Outputs.rSubnet
+    Value: !GetAtt rPublicSubnetB.Outputs.rSubnet
   oPrivateSubnetA:
-    Value: rPrivateSubnetA.Outputs.rSubnet
+    Value: !GetAtt rPrivateSubnetA.Outputs.rSubnet
   oPrivateSubnetB:
-    Value: rPrivateSubnetA.Outputs.rSubnet
+    Value: !GetAtt rPrivateSubnetA.Outputs.rSubnet
   oDataSubnetA:
-    Value: rDataSubnetA.Outputs.rSubnet
+    Value: !GetAtt rDataSubnetA.Outputs.rSubnet
   oDataSubnetB:
-    Value: rDataSubnetA.Outputs.rSubnet
+    Value: !GetAtt rDataSubnetA.Outputs.rSubnet
   oS3Endpoint:
-    Value: rS3Endpoint
+    Value: !Ref rS3Endpoint
   oDdbEndpoint:
-    Value: rDdbEndpoint
+    Value: !Ref rDdbEndpoint
