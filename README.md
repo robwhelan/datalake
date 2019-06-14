@@ -39,3 +39,19 @@ TODO
 * Security account & VPC
 * Auditing
 * Monitoring
+
+ROLES
+
+
+--Group
+  --Users
+  --Permissions (policies and/or roles (which are a collection of policies))
+
+Intersection of two areas:
+Role set by job function (data steward, engineer, scientist, bi user)
+Role set by ability to see data of varying security (proprietary, restricted, secret)
+
+Data Steward -- administrator.
+Data Engineer -- can read/write to all buckets.
+Data Scientist -- can write only to the curated zone. Can create new glue jobs to stage data. Can do everything with sagemaker.
+Business Intelligence Analyst -- run queries (read only), upload new data to a sandbox, use quicksight etc.

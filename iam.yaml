@@ -1,0 +1,16 @@
+
+#restricting data access if it has any tagging.
+      {
+            "Effect": "Deny",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEqualsIgnoreCase": {
+                    "s3:ExistingObjectTag/dataclassification": "proprietary",
+                    "s3:ExistingObjectTag/dataclassification": "restricted",
+                    "s3:ExistingObjectTag/dataclassification": "secret"
+                }
+            }
+        },
