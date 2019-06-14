@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC infrastructure
+Parameters:
+  pProjectName:
+    Type: String
+    Description: overall project name which will be used for tags
+Resources:
+  rVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'false'
+      EnableDnsHostnames: 'false'
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: Datalake-VPC
+  rInternetGateway:
+    Type: AWS::EC2::InternetGateway
+  rInternetGatewayAttachment:
+    DependsOn:
+      - rVPC
+      - rInternetGateway
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref rInternetGateway
+      VpcId: !Ref rVPC
+  rPublicSubnetA:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rVPC
+    Properties:
+      Parameters:
+        pAvailabilityZone: us-east-1a
+        pCidrBlock: 10.0.0.0/20
+        pVpcId: !Ref rVPC
+        pName: datalake-public-subnet-a
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/subnet.yaml
+      TimeoutInMinutes: 15
+  rPublicSubnetB:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rVPC
+    Properties:
+      Parameters:
+        pAvailabilityZone: us-east-1b
+        pCidrBlock: 10.0.16.0/20
+        pVpcId: !Ref rVPC
+        pName: datalake-public-subnet-b
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/subnet.yaml
+      TimeoutInMinutes: 15
+  rPrivateSubnetA:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rVPC
+    Properties:
+      Parameters:
+        pAvailabilityZone: us-east-1a
+        pCidrBlock: 10.0.32.0/20
+        pVpcId: !Ref rVPC
+        pName: datalake-private-subnet-a
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/subnet.yaml
+      TimeoutInMinutes: 15
+  rPrivateSubnetB:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rVPC
+    Properties:
+      Parameters:
+        pAvailabilityZone: us-east-1b
+        pCidrBlock: 10.0.48.0/20
+        pVpcId: !Ref rVPC
+        pName: datalake-private-subnet-b
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/subnet.yaml
+      TimeoutInMinutes: 15
+  rDataSubnetA:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rVPC
+    Properties:
+      Parameters:
+        pAvailabilityZone: us-east-1a
+        pCidrBlock: 10.0.64.0/20
+        pVpcId: !Ref rVPC
+        pName: datalake-data-subnet-a
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/subnet.yaml
+      TimeoutInMinutes: 15
+  rDataSubnetB:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rVPC
+    Properties:
+      Parameters:
+        pAvailabilityZone: us-east-1b
+        pCidrBlock: 10.0.80.0/20
+        pVpcId: !Ref rVPC
+        pName: datalake-data-subnet-b
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/subnet.yaml
+      TimeoutInMinutes: 15
+  rS3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    DependsOn:
+      - rPrivateSubnetA
+      - rPrivateSubnetB
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+            - 's3:GetObject'
+          Resource: '*'
+          Principal: '*'
+      RouteTableIds:
+        - !GetAtt rPrivateSubnetA.Outputs.rRouteTable
+        - !GetAtt rPrivateSubnetB.Outputs.rRouteTable
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: !Ref rVPC
+      Tags:
+        Key: Name
+        Value: datalake-endpoint-for-s3
+Outputs:
+  oPublicSubnetA:
+    Value: rPublicSubnetA.Outputs.rSubnet
+  oPublicSubnetB:
+    Value: rPublicSubnetB.Outputs.rSubnet
+  oPrivateSubnetA:
+    Value: rPrivateSubnetA.Outputs.rSubnet
+  oPrivateSubnetB:
+    Value: rPrivateSubnetA.Outputs.rSubnet
+  oDataSubnetA:
+    Value: rDataSubnetA.Outputs.rSubnet
+  oDataSubnetB:
+    Value: rDataSubnetA.Outputs.rSubnet

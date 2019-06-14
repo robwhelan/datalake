@@ -4,7 +4,9 @@ Design Principles
 3. Few (3-5), simple, easily-understood roles instead of many roles.
 4. One database, many tables.
 5. Glue (PySpark) for ETL with simple transformations.
-
+6. ETL to be built out after data initially loaded.
+7. Single Glue crawler for all zones, all data. This should be expanded as new data arrives.
+8. Private S3 endpoints from the private subnets (not from the public or data subnets)
 
 Features
 * As many zones as you want. 4 zones by default.
@@ -17,6 +19,7 @@ Features
   Then, create a Crawler and specify the location for the initial data. This will create a table prefixed with the prefix you specify ()
   (Run the crawler via SQS / lambda after the resource is created? )
   After the table is created, update the stack with a transformation?
+* Network: launched in us-east-1. Update the VPC stack otherwise (DHCP option sets)
 
 * Dead letter queue to receive failed messages from every zone, and every lambda consuming the queue.
 

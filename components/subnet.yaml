@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Subnet infrastructure
+Parameters:
+  pAvailabilityZone:
+    Type: String
+  pCidrBlock:
+    Type: String
+  pVpcId:
+    Type: String
+  pName:
+    Type: String
+Resources:
+  rSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref pAvailabilityZone
+      CidrBlock: !Ref pCidrBlock
+      VpcId: !Ref pVpcId
+      Tags:
+        - Key: Name
+          Value: !Ref pName
+  rSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub 'datalake-route-table-for-${pName}'
+      VpcId: !Ref pVpcId
+  rSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+     SubnetId: !Ref rSubnet
+     RouteTableId: !Ref rSubnetRouteTable
+Outputs:
+  rSubnet:
+    Value: !Ref rSubnet
+  rRouteTable:
+    Value: !Ref rSubnetRouteTable
