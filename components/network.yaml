@@ -113,6 +113,28 @@ Resources:
       Tags:
         Key: Name
         Value: datalake-endpoint-for-s3
+  rDdbEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    DependsOn:
+      - rPrivateSubnetA
+      - rPrivateSubnetB
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+            - 'dynamodb:*' #will need to make this more precise later. Scan, Batch Get, etc, query.
+          Resource: '*'
+          Principal: '*'
+      RouteTableIds:
+        - !GetAtt rPrivateSubnetA.Outputs.rRouteTable
+        - !GetAtt rPrivateSubnetB.Outputs.rRouteTable
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
+      VpcId: !Ref rVPC
+      Tags:
+        Key: Name
+        Value: datalake-endpoint-for-ddb
 Outputs:
   oPublicSubnetA:
     Value: rPublicSubnetA.Outputs.rSubnet
@@ -126,3 +148,7 @@ Outputs:
     Value: rDataSubnetA.Outputs.rSubnet
   oDataSubnetB:
     Value: rDataSubnetA.Outputs.rSubnet
+  oS3Endpoint:
+    Value: rS3Endpoint
+  oDdbEndpoint:
+    Value: rDdbEndpoint
