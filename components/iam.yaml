@@ -6,8 +6,11 @@ Parameters:
     Description: overall project name which will be used for tags
 Resources:
   rDataEngineerExtraPolicies:
+    DependsOn: rDataEngineerGroup
     Type: AWS::IAM::Policy
     Properties:
+      Groups:
+        - !Ref rDataEngineerGroup
       PolicyDocument: #glue, step functions, emr, athena
           Version: "2012-10-17"
           Statement:
@@ -21,8 +24,11 @@ Resources:
               Resource: "*"
       PolicyName: !Sub '${pProjectName}-extra-data-engineer-policies'
   rDataAnalystExtraPolicies:
+    DependsOn: rDataAnalystGroup
     Type: AWS::IAM::Policy
     Properties:
+      Groups:
+        - !Ref rDataAnalystGroup
       PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -46,8 +52,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/job-function/DatabaseAdministrator
       Path: /job/data-engineer/
-      Policies:
-        - !Ref rDataEngineerExtraPolicies
   rDataScientistGroup:
     Type: AWS::IAM::Group
     Properties:
@@ -62,8 +66,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/job-function/DatabaseAdministrator
       Path: /job/data-analyst/
-      Policies:
-        - !Ref rDataAnalystExtraPolicies
 
 
 #restricting data access if it has any tagging.
