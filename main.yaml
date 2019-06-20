@@ -6,6 +6,15 @@ Parameters:
     Description: overall project name which will be used for tags
 Resources:
   #IAM to produce the roles.
+  rIam:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        pProjectName: !Ref pProjectName
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/iam.yaml
+      TimeoutInMinutes: 5
+
+  #dead letter queue for general failures
   rDeadLetterQueue:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -32,6 +41,24 @@ Resources:
       TimeoutInMinutes: 15
 
   #vpc
+  rVpc:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        pProjectName: !Ref pProjectName
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/network.yaml
+      TimeoutInMinutes: 5
+
+  #main database for data catalog.
+  rGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+          Description: Central virtual database for all tables in the data lake.
+          #LocationUri: String
+          Name: !Sub '${pProjectName}-datalake-main-database'
+
   #config rules
   #logging
   #other security, like macie

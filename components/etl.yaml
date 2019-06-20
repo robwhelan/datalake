@@ -1,26 +1,21 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: ETL infrastructure
+Parameters:
+  pGlueDatabase:
+    Type: String
+    Description: overall project name which will be used for tags
 Resources:
-  rGlueDatabase:
-    Type: AWS::Glue::Database
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseInput:
-          Description: my database
-          #LocationUri: String
-          Name: medicare-payments
   rGlueCrawler:
     Type: AWS::Glue::Crawler
-    DependsOn: rGlueDatabase
     Properties:
-      DatabaseName: !Ref rGlueDatabase
-      Description: Crawls medicare data to establish table
+      DatabaseName: !Ref pGlueDatabase
+      Description: Crawls data to establish table
       Name: medicare-payments-crawler
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: 'medicare-'
+      TablePrefix: 'medicare-' #generalize this
       Targets:
         S3Targets:
           - Path: 's3://bigdatalabsrww/medicare/'

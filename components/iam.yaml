@@ -66,15 +66,18 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/job-function/DatabaseAdministrator
       Path: /job/data-analyst/
-
-
-#restricting data access if it has any tagging.
-
-#group for data steward
-#group fro data enginee
-#group for data scientist
-#group for bi analysts
-
-#group for proprietary
-#group for confidential
-#group for secret
+  rProprietaryDataGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-proprietary-data-access'
+      Path: /access-level/proprietary/
+  rConfidentialDataGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-confidential-data-access'
+      Path: /access-level/confidential/
+  rSecretDataGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-secret-data-access'
+      Path: /access-level/secret/
