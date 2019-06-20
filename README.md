@@ -39,6 +39,7 @@ TODO
 * Security account & VPC
 * Auditing
 * Monitoring
+  * set up Macie outside of cloudformation. Might be a lambda or something that runs every week.
 
 ROLES
 
@@ -57,7 +58,7 @@ ROLES
         "Condition": {
             "StringEqualsIgnoreCase": {
                 "s3:ExistingObjectTag/dataclassification": "proprietary",
-                "s3:ExistingObjectTag/dataclassification": "restricted",
+                "s3:ExistingObjectTag/dataclassification": "confidential",
                 "s3:ExistingObjectTag/dataclassification": "secret"
             }
         }

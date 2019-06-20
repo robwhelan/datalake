@@ -5,6 +5,45 @@ Parameters:
     Type: String
     Description: overall project name which will be used for tags
 Resources:
+  rProprietaryAccessPolicy:
+    DependsOn: rProprietaryAccessGroup
+    Type: AWS::IAM::Policy
+    Properties:
+      Groups:
+        - !Ref rProprietaryAccessGroup
+      PolicyDocument: #denies access to any data in s3 that is higher security than confidential or secret.
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Deny"
+              Action:
+                - "s3:GetObject"
+              Resource: "*"
+              Condition:
+                ForAnyValue:StringEqualsIgnoreCase:
+                  s3:ExistingObjectTag/dataclassification:
+                    - confidential
+                    - secret
+      PolicyName: !Sub '${pProjectName}-proprietary-access-policy'
+  rConfidentialAccessPolicy:
+    DependsOn: rConfidentialAccessGroup
+    Type: AWS::IAM::Policy
+    Properties:
+      Groups:
+        - !Ref rConfidentialAccessGroup
+      PolicyDocument: #denies access to any data in s3 that is higher security than confidential or secret.
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Deny"
+              Action:
+                - "s3:GetObject"
+              Resource: "*"
+              Condition:
+                StringEqualsIgnoreCase:
+                  s3:ExistingObjectTag/dataclassification: secret
+      PolicyName: !Sub '${pProjectName}-confidential-access-policy'
+
   rDataEngineerExtraPolicies:
     DependsOn: rDataEngineerGroup
     Type: AWS::IAM::Policy
@@ -38,6 +77,7 @@ Resources:
                 - "athena:*"
               Resource: "*"
       PolicyName: !Sub '${pProjectName}-extra-data-analyst-policies'
+
   rDataStewardGroup:
     Type: AWS::IAM::Group
     Properties:
@@ -66,17 +106,18 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/job-function/DatabaseAdministrator
       Path: /job/data-analyst/
-  rProprietaryDataGroup:
+
+  rProprietaryAccessGroup:
     Type: AWS::IAM::Group
     Properties:
       GroupName: !Sub '${pProjectName}-proprietary-data-access'
       Path: /access-level/proprietary/
-  rConfidentialDataGroup:
+  rConfidentialAccessGroup:
     Type: AWS::IAM::Group
     Properties:
       GroupName: !Sub '${pProjectName}-confidential-data-access'
       Path: /access-level/confidential/
-  rSecretDataGroup:
+  rSecretAccessGroup:
     Type: AWS::IAM::Group
     Properties:
       GroupName: !Sub '${pProjectName}-secret-data-access'
