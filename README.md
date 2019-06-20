@@ -47,9 +47,25 @@ ROLES
   --Users
   --Permissions (policies and/or roles (which are a collection of policies))
 
+
+  {
+        "Effect": "Deny",
+        "Action": [
+            "s3:GetObject"
+        ],
+        "Resource": "*",
+        "Condition": {
+            "StringEqualsIgnoreCase": {
+                "s3:ExistingObjectTag/dataclassification": "proprietary",
+                "s3:ExistingObjectTag/dataclassification": "restricted",
+                "s3:ExistingObjectTag/dataclassification": "secret"
+            }
+        }
+    },
+
 Intersection of two areas:
-Role set by job function (data steward, engineer, scientist, bi user)
-Role set by ability to see data of varying security (proprietary, restricted, secret)
+Groups set by job function (data steward, engineer, scientist, bi user) -- put this in the path
+Groups set by ability to see data of varying security (proprietary, restricted, secret) -- put in the path
 
 Data Steward -- administrator.
 Data Engineer -- can read/write to all buckets.

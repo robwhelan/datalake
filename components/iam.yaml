@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC infrastructure
+Parameters:
+  pProjectName:
+    Type: String
+    Description: overall project name which will be used for tags
+Resources:
+  rDataEngineerExtraPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: #glue, step functions, emr, athena
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Action:
+                - "athena:*"
+                - "emr:*"
+                - "glue:*"
+                - "states:*" #step functions
+              Resource: "*"
+      PolicyName: !Sub '${pProjectName}-extra-data-engineer-policies'
+  rDataAnalystExtraPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Action:
+                - "athena:*"
+              Resource: "*"
+      PolicyName: !Sub '${pProjectName}-extra-data-analyst-policies'
+  rDataStewardGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-data-steward'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Path: /job/data-steward/
+  rDataEngineerGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-data-engineer'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/job-function/DatabaseAdministrator
+      Path: /job/data-engineer/
+      Policies:
+        - !Ref rDataEngineerExtraPolicies
+  rDataScientistGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-data-scientist'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/job-function/DataScientist
+      Path: /job/data-scientist/
+  rDataAnalystGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub '${pProjectName}-data-analyst'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/job-function/DatabaseAdministrator
+      Path: /job/data-analyst/
+      Policies:
+        - !Ref rDataAnalystExtraPolicies
+
+
+#restricting data access if it has any tagging.
+
+#group for data steward
+#group fro data enginee
+#group for data scientist
+#group for bi analysts
+
+#group for proprietary
+#group for confidential
+#group for secret
