@@ -21,6 +21,7 @@ Resources:
     Type: AWS::Glue::Job
     Properties:
       #AllocatedCapacity: Double
+      GlueVersion: 1.0
       Command:
         Name: glueetl #default for apache spark jobs
         PythonVersion: 3
