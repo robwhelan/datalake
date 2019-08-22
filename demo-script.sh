@@ -1,0 +1,9 @@
+aws s3 cp olist_customers_dataset.csv s3://bigdatalabsrww/ecommerce/customers/
+aws s3 cp olist_geolocation_dataset.csv s3://bigdatalabsrww/ecommerce/geolocation/
+aws s3 cp olist_order_items_dataset.csv s3://bigdatalabsrww/ecommerce/order-items/
+aws s3 cp olist_order_payments_dataset.csv s3://bigdatalabsrww/ecommerce/order-payments/
+aws s3 cp olist_order_reviews_dataset.csv s3://bigdatalabsrww/ecommerce/order-reviews/
+aws s3 cp olist_orders_dataset.csv s3://bigdatalabsrww/ecommerce/orders-dataset/
+aws s3 cp olist_products_dataset.csv s3://bigdatalabsrww/ecommerce/products/
+aws s3 cp olist_sellers_dataset.csv s3://bigdatalabsrww/ecommerce/sellers/
+aws s3 cp product_category_name_translation.csv s3://bigdatalabsrww/ecommerce/product-category-name/

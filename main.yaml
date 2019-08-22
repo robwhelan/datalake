@@ -14,6 +14,93 @@ Resources:
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/iam.yaml
       TimeoutInMinutes: 5
 
+  rDropZone:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - rDeadLetterQueue
+      - rLoggingBucket
+    Properties:
+      Parameters:
+        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
+        pDownstreamZone: raw
+        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
+        pLoggingBucket: !Ref rLoggingBucket
+        pProjectName: !Ref pProjectName
+        pSqsQueueVisibilityTimeout: 120
+        pTransitionClass: GLACIER
+        pTransitionInDays: 7
+        pZone: drop
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
+      TimeoutInMinutes: 15
+
+  rRawZone:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - rDeadLetterQueue
+      - rLoggingBucket
+    Properties:
+      Parameters:
+        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
+        pDownstreamZone: raw
+        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
+        pLoggingBucket: !Ref rLoggingBucket
+        pProjectName: !Ref pProjectName
+        pSqsQueueVisibilityTimeout: 120
+        pTransitionClass: GLACIER
+        pTransitionInDays: 7
+        pZone: raw
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
+      TimeoutInMinutes: 15
+
+  rCuratedZone:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - rDeadLetterQueue
+      - rLoggingBucket
+    Properties:
+      Parameters:
+        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
+        pDownstreamZone: raw
+        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
+        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
+        pLoggingBucket: !Ref rLoggingBucket
+        pProjectName: !Ref pProjectName
+        pSqsQueueVisibilityTimeout: 120
+        pTransitionClass: GLACIER
+        pTransitionInDays: 7
+        pZone: curated
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
+      TimeoutInMinutes: 15
+
+  #main database for data catalog.
+  rEtlPipeline:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - rDropZone
+      - rRawZone
+      - rCuratedZone
+    Properties:
+      Parameters:
+        pProjectName: !Ref pProjectName
+        pDropZone: !GetAtt rDropZone.Outputs.oS3Bucket
+        pRawZone: !GetAtt rRawZone.Outputs.oS3Bucket
+        pCuratedZone: !GetAtt rCuratedZone.Outputs.oS3Bucket
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/etl.yaml
+      TimeoutInMinutes: 5
+
+  #cloudtrail logging
+  rCloudtrailTrail:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: rLoggingBucket
+    Properties:
+      Parameters:
+        pLoggingBucket: !Ref rLoggingBucket
+      TemplateURL: https://datalake-rww.s3.amazonaws.com/monitoring/cloudtrail.yaml
+      TimeoutInMinutes: 5
+
+  #Monitoring
   #dead letter queue for general failures
   rDeadLetterQueue:
     Type: AWS::CloudFormation::Stack
@@ -23,42 +110,18 @@ Resources:
         pQueueName: !Sub '${pProjectName}-dead-letter-queue'
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/queue-dead-letter.yaml
       TimeoutInMinutes: 5
-  rDropZone:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rDeadLetterQueue
-    Properties:
-      Parameters:
-        pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pDownstreamZone: raw
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pProjectName: !Ref pProjectName
-        pSqsQueueVisibilityTimeout: 120
-        pTransitionClass: GLACIER
-        pTransitionInDays: 7
-        pZone: drop
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
-      TimeoutInMinutes: 15
 
-  #vpc
-  rVpc:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        pProjectName: !Ref pProjectName
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/network.yaml
-      TimeoutInMinutes: 5
-
-  #main database for data catalog.
-  rGlueDatabase:
-    Type: AWS::Glue::Database
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseInput:
-          Description: Central virtual database for all tables in the data lake.
-          #LocationUri: String
-          Name: !Sub '${pProjectName}-datalake-main-database'
+  #central logging bucket for any logging event - s3 access logging, cloudtrail.
+  #TODO: this must be in a different account later.
+  rLoggingBucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties: {}
 
   #config rules
   #logging
   #other security, like macie
+
+Outputs:
+  oZoneBucket:
+    Value: !GetAtt rDatalakeZone.Outputs.oS3Bucket

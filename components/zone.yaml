@@ -13,6 +13,9 @@ Parameters:
   pKeyUser:
     Type: String
     Description: ARN of key user role.
+  pLoggingBucket:
+    Type: String
+    Description: the bucket to which all logs will be sent
   pProjectName:
     Type: String
     Description: The lowercase, overall name of the project which will be used for naming and for tagging.
@@ -70,42 +73,17 @@ Resources:
             Transitions:
               - StorageClass: !Ref pTransitionClass
                 TransitionInDays: !Ref pTransitionInDays
+      LoggingConfiguration:
+        DestinationBucketName: !Ref pLoggingBucket
+        LogFilePrefix: !Sub 's3-access-logs/${pZone}/'
       NotificationConfiguration: #publish to an sqs queue on every new event.
         QueueConfigurations:
           - Event: 's3:ObjectCreated:*'
             Queue: !GetAtt rSqsQueue.Outputs.rQueueArn
-  rSqsQueue:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rCMK
-    Properties:
-      Parameters:
-        pCMKId: !GetAtt rCMK.Outputs.rKeyId
-        pDeadLetterQueueArn: !Ref pDeadLetterQueueArn
-        pProjectName: !Ref pProjectName
-        pQueueName: !Sub '${pProjectName}-${pZone}-queue'
-        pSqsQueueVisibilityTimeout: 120
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/queue.yaml
-      TimeoutInMinutes: 15
-  rLambda:
-    #condition: not the curated zone, because there is no downstream bucket for curated zone.
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rSqsQueue #because the queue is needed for the event source mapping within this nested stack
-    Properties:
-      Parameters:
-        pDeadLetterQueueArn: !Ref pDeadLetterQueueArn
-        pDownstreamBucket: !Sub '${pProjectName}-${pDownstreamZone}-${AWS::AccountId}'
-        pLambdaSourceCodeBucket: datalake-rww
-        pLambdaSourceCodeKey: functions/lambda-python-starter.zip
-        pProjectName: !Ref pProjectName
-        pSourceQueueArn: !GetAtt rSqsQueue.Outputs.rQueueArn
-        pZone: !Ref pZone
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/lambda.yaml
-      TimeoutInMinutes: 15
-  #lambda to process stuff off queue.
 Outputs:
-  rS3Bucket:
+  oS3Bucket:
     Value: !Ref rS3Bucket
-  rSqsQueueUrl:
+  oSqsQueueUrl:
     Value: !Ref rSqsQueue
-  rSqsQueueArn:
+  oSqsQueueArn:
     Value: !GetAtt rSqsQueue.Outputs.rQueueArn

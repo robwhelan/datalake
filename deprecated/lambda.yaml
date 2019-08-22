@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Creates a KMS customer managed CMK.
+Description: Creates a lambda.
 Parameters:
   pDeadLetterQueueArn:
     Type: String

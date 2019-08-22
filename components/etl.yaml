@@ -1,22 +1,62 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: ETL infrastructure
+Description: ETL infrastructure. Glue database, crawler for each zone, and jobs.
 Parameters:
-  pGlueDatabase:
+  pProjectName:
     Type: String
-    Description: overall project name which will be used for tags
+  pDropZoneBucketName:
+    Type: String
+  pRawZoneBucketName:
+    Type: String
+  pCuratedZoneBucketName:
+    Type: String
 Resources:
-  rGlueCrawler:
+  rGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+          Description: Central virtual database for all tables in the data lake.
+          #LocationUri: String
+          Name: !Sub '${pProjectName}-datalake-main-database'
+  rGlueCrawlerDropZone:
     Type: AWS::Glue::Crawler
     Properties:
       DatabaseName: !Ref pGlueDatabase
-      Description: Crawls data to establish table
-      Name: medicare-payments-crawler
+      Description: Crawls data in the drop zone to establish table
+      Name: !Sub '${pProjectName}-datalake-crawler-dropzone'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: 'medicare-' #generalize this
+      TablePrefix: !Sub '{pProjectName}_drop_' #generalize this
       Targets:
         S3Targets:
-          - Path: 's3://bigdatalabsrww/medicare/'
-          - Path: 's3://bigdatalabsrww/glue-test-next/'
+          - Path: !Sub 's3://${pDropZoneBucketName}/'
+  rGlueCrawlerRawZone:
+    Type: AWS::Glue::Crawler
+    Properties:
+      DatabaseName: !Ref pGlueDatabase
+      Description: Crawls data to establish table in the raw zone - general analytics.
+      Name: !Sub '${pProjectName}-datalake-crawler-rawzone'
+      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      SchemaChangePolicy:
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+        UpdateBehavior: UPDATE_IN_DATABASE
+      TablePrefix: !Sub '{pProjectName}_raw_' #generalize this
+      Targets:
+        S3Targets:
+          - Path: !Sub 's3://${pRawZoneBucketName}/'
+  rGlueCrawlerCuratedZone:
+    Type: AWS::Glue::Crawler
+    Properties:
+      DatabaseName: !Ref pGlueDatabase
+      Description: Crawls data to establish table in the curated zone for a data mart.
+      Name: !Sub '${pProjectName}-datalake-crawler-curatedzone'
+      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      SchemaChangePolicy:
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+        UpdateBehavior: UPDATE_IN_DATABASE
+      TablePrefix: !Sub '{pProjectName}_curated_' #generalize this
+      Targets:
+        S3Targets:
+          - Path: !Sub 's3://${pCuratedZoneBucketName}/'

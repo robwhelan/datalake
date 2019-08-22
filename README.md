@@ -2,11 +2,10 @@ Design Principles
 1. Send only two stacks: 1 for your prod account, 1 for your security account.
 2. Allow for remote updates of the stacks as the architecture evolves.
 3. Few (3-5), simple, easily-understood roles instead of many roles.
-4. One database, many tables.
+4. One database, many tables, all populated by Glue crawlers
 5. Glue (PySpark) for ETL with simple transformations.
 6. ETL to be built out after data initially loaded.
-7. Single Glue crawler for all zones, all data. This should be expanded as new data arrives.
-8. Private S3 and DDB endpoints from the private subnets (not from the public or data subnets). Any lambda should run inside the private subnets.
+7. Private S3 and DDB endpoints from the private subnets (not from the public or data subnets). Any lambda should run inside the private subnets.
 
 Features
 * As many zones as you want. 4 zones by default.
@@ -29,6 +28,23 @@ Features
   3. An all-in-one serverless data science / data engineering lambda.
   4. The stub assumes a CSV was dropped into the zone bucket; it gets picked up, example transformation on it, and then re-saved as a new CSV in the next zone.
 
+* Monitoring:
+Cloudtrail is created as a multi region trail.
+
+
+* architecture
+Zone:
+1. bucket
+2. CMK
+3. SQS queue for new object puts
+4. Lambda to consume the queue.
+
+ETL:
+1. Glue database - built at the beginning.
+2. Glue crawler - also built at the beginning.
+3. Later, TODO run the crawler after first data stored.
+4. Build a Job from cloudformation, that runs on new data.
+
 # datalake
 Notes
 * Works for one partition in each bucket. If your drop zone will spread to multiple data streams, such as images in one, and clickstream in another, add another SQS queue for notifications, and configure prefixes for each notifications (/images/ and /clickstream/). Then build a completely different lambda to work off the new queue. Modify the lambda to create a key that matches the partition.
@@ -48,21 +64,6 @@ ROLES
   --Users
   --Permissions (policies and/or roles (which are a collection of policies))
 
-
-  {
-        "Effect": "Deny",
-        "Action": [
-            "s3:GetObject"
-        ],
-        "Resource": "*",
-        "Condition": {
-            "StringEqualsIgnoreCase": {
-                "s3:ExistingObjectTag/dataclassification": "proprietary",
-                "s3:ExistingObjectTag/dataclassification": "confidential",
-                "s3:ExistingObjectTag/dataclassification": "secret"
-            }
-        }
-    },
 
 Intersection of two areas:
 Groups set by job function (data steward, engineer, scientist, bi user) -- put this in the path
