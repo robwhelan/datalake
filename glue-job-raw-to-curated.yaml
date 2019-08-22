@@ -12,7 +12,7 @@ Resources:
       Command:
         Name: glueetl #default for apache spark jobs
         PythonVersion: 3
-        ScriptLocation: s3://datalake-rww/glue-scripts/raw-to-refined.py
+        ScriptLocation: s3://datalake-rww/glue-scripts/raw-to-curated.py
       DefaultArguments:
         "--database-name": !Sub '${pProjectName}-datalake-main-database'
         '--table-name': 'person'
