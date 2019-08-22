@@ -75,9 +75,9 @@ Resources:
     Properties:
       Parameters:
         pProjectName: !Ref pProjectName
-        pDropZone: !GetAtt rDropZone.Outputs.oS3Bucket
-        pRawZone: !GetAtt rRawZone.Outputs.oS3Bucket
-        pCuratedZone: !GetAtt rCuratedZone.Outputs.oS3Bucket
+        pDropZoneBucket: !GetAtt rDropZone.Outputs.oS3Bucket
+        pRawZoneBucket: !GetAtt rRawZone.Outputs.oS3Bucket
+        pCuratedZoneBucket: !GetAtt rCuratedZone.Outputs.oS3Bucket
       TemplateURL: https://datalake-rww.s3.amazonaws.com/components/etl.yaml
       TimeoutInMinutes: 5
 
