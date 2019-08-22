@@ -3,11 +3,11 @@ Description: ETL infrastructure. Glue database, crawler for each zone, and jobs.
 Parameters:
   pProjectName:
     Type: String
-  pDropZoneBucketName:
+  pDropZoneBucket:
     Type: String
-  pRawZoneBucketName:
+  pRawZoneBucket:
     Type: String
-  pCuratedZoneBucketName:
+  pCuratedZoneBucket:
     Type: String
 Resources:
   rGlueDatabase:
@@ -21,7 +21,7 @@ Resources:
   rGlueCrawlerDropZone:
     Type: AWS::Glue::Crawler
     Properties:
-      DatabaseName: !Ref pGlueDatabase
+      DatabaseName: !Ref rGlueDatabase
       Description: Crawls data in the drop zone to establish table
       Name: !Sub '${pProjectName}-datalake-crawler-dropzone'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
@@ -31,11 +31,11 @@ Resources:
       TablePrefix: !Sub '${pProjectName}_drop_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pDropZoneBucketName}/'
+          - Path: !Sub 's3://${pDropZoneBucket}/'
   rGlueCrawlerRawZone:
     Type: AWS::Glue::Crawler
     Properties:
-      DatabaseName: !Ref pGlueDatabase
+      DatabaseName: !Ref rGlueDatabase
       Description: Crawls data to establish table in the raw zone - general analytics.
       Name: !Sub '${pProjectName}-datalake-crawler-rawzone'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
@@ -45,11 +45,11 @@ Resources:
       TablePrefix: !Sub '${pProjectName}_raw_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pRawZoneBucketName}/'
+          - Path: !Sub 's3://${pRawZoneBucket}/'
   rGlueCrawlerCuratedZone:
     Type: AWS::Glue::Crawler
     Properties:
-      DatabaseName: !Ref pGlueDatabase
+      DatabaseName: !Ref rGlueDatabase
       Description: Crawls data to establish table in the curated zone for a data mart.
       Name: !Sub '${pProjectName}-datalake-crawler-curatedzone'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
@@ -59,4 +59,4 @@ Resources:
       TablePrefix: !Sub '${pProjectName}_curated_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pCuratedZoneBucketName}/'
+          - Path: !Sub 's3://${pCuratedZoneBucket}/'
