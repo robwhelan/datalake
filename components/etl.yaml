@@ -28,7 +28,7 @@ Resources:
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: !Sub '{pProjectName}_drop_' #generalize this
+      TablePrefix: !Sub '${pProjectName}_drop_' #generalize this
       Targets:
         S3Targets:
           - Path: !Sub 's3://${pDropZoneBucketName}/'
@@ -42,7 +42,7 @@ Resources:
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: !Sub '{pProjectName}_raw_' #generalize this
+      TablePrefix: !Sub '${pProjectName}_raw_' #generalize this
       Targets:
         S3Targets:
           - Path: !Sub 's3://${pRawZoneBucketName}/'
@@ -56,7 +56,7 @@ Resources:
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: !Sub '{pProjectName}_curated_' #generalize this
+      TablePrefix: !Sub '${pProjectName}_curated_' #generalize this
       Targets:
         S3Targets:
           - Path: !Sub 's3://${pCuratedZoneBucketName}/'

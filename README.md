@@ -1,3 +1,13 @@
+How:
+1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
+2. Upload some data to the drop zone.
+3. Run the first crawler (drop zone crawler). It will create a metadata table for the drop zone.
+4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone.
+5. Run the glue job. This will move data into the raw zone, and set up for an hourly schedule.
+6. Run the second crawler -- the one for the raw zone. This will create a metadata table for the raw zone.
+7. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
+8. Run the glue job. This will move the new dataset into the curated zone.
+
 Design Principles
 1. Send only two stacks: 1 for your prod account, 1 for your security account.
 2. Allow for remote updates of the stacks as the architecture evolves.

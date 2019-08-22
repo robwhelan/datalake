@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: A job that moves data from the drop zone to the raw zone.
+Parameters:
+  pProjectName:
+    Type: String
+    Description: the ARN of the dead letter queue
+  rGlueJobDropToRaw:
+    Type: AWS::Glue::Job
+    Properties:
+      #AllocatedCapacity: Double
+      Command:
+        Name: glueetl #default for apache spark jobs
+        PythonVersion: 3
+        ScriptLocation: #s3 location for the script...
+
+      #Connections:
+    #    ConnectionsList
+      DefaultArguments:
+        -
+          '--database-name': !Sub '${pProjectName}-datalake-main-database'
+          '--table-name':
+      Description: Convert incoming CSV to Parquet.
+      #ExecutionProperty:
+      #  ExecutionProperty
+      #GlueVersion: String
+      #LogUri: String
+      #MaxCapacity: Double
+      #MaxRetries: Double
+      Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
+      #NumberOfWorkers: Integer
+      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      #SecurityConfiguration: String
+      #Tags: Json
+      #WorkerType: String
