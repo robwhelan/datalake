@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: builds a HIPAA-compliant datalake
+Description: builds a basic datalake with 3 zones and dedicated encryption keys.
 Parameters:
   pProjectName:
     Type: String
-    Description: overall project name which will be used for tags
+    Description: overall project name which will be used for tags and resource naming.
 Resources:
   #IAM to produce the roles.
   rIam:
@@ -18,14 +18,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - rDeadLetterQueue
-      - rLoggingBucket
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pDownstreamZone: raw
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
         pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pLoggingBucket: !Ref rLoggingBucket
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
@@ -38,14 +35,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - rDeadLetterQueue
-      - rLoggingBucket
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pDownstreamZone: raw
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
         pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pLoggingBucket: !Ref rLoggingBucket
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
@@ -58,14 +52,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - rDeadLetterQueue
-      - rLoggingBucket
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pDownstreamZone: raw
         pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
         pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
-        pLoggingBucket: !Ref rLoggingBucket
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
@@ -91,14 +82,14 @@ Resources:
       TimeoutInMinutes: 5
 
   #cloudtrail logging
-  rCloudtrailTrail:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: rLoggingBucket
-    Properties:
-      Parameters:
-        pLoggingBucket: !Ref rLoggingBucket
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/monitoring/cloudtrail.yaml
-      TimeoutInMinutes: 5
+  #rCloudtrailTrail:
+  #  Type: AWS::CloudFormation::Stack
+  #  DependsOn: rLoggingBucket
+  #  Properties:
+  #    Parameters:
+  #      pLoggingBucket: !Ref rLoggingBucket
+  #    TemplateURL: https://datalake-rww.s3.amazonaws.com/monitoring/cloudtrail.yaml
+  #    TimeoutInMinutes: 5
 
   #Monitoring
   #dead letter queue for general failures
@@ -113,15 +104,10 @@ Resources:
 
   #central logging bucket for any logging event - s3 access logging, cloudtrail.
   #TODO: this must be in a different account later.
-  rLoggingBucket:
-    DeletionPolicy: Retain
-    Type: AWS::S3::Bucket
-    Properties: {}
-
   #config rules
   #logging
   #other security, like macie
 
 Outputs:
-  oZoneBucket:
-    Value: !GetAtt rDatalakeZone.Outputs.oS3Bucket
+  oDropZoneBucket:
+    Value: !GetAtt rDropZone.Outputs.oS3Bucket

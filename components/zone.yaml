@@ -59,7 +59,6 @@ Resources:
       TimeoutInMinutes: 5
   rS3Bucket:
     Type: AWS::S3::Bucket
-    DependsOn: rSqsQueue
     Properties:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
