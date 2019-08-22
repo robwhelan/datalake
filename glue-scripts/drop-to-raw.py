@@ -8,10 +8,10 @@ from awsglue.job import Job
 ## @params: [JOB_NAME]
 args = getResolvedOptions(sys.argv, [
     'JOB_NAME',
-    'database-name', #array of arguemnts you want to grab.
-    'table-name',
-    'downstream-bucket',
-    'data-partition']
+    'database_name', #array of arguemnts you want to grab.
+    'table_name',
+    'downstream_bucket',
+    'data_partition']
     )
 
 sc = SparkContext()
@@ -20,12 +20,14 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-downstreamBucket = 's3://' + args['downstream-bucket'] + '/' + args['data-partition'] + '/'
+print("arguments: ", args)
+
+downstreamBucket = 's3://' + args['downstream_bucket'] + '/' + args['data_partition'] + '/'
 ## @type: DataSource
 ## @args: [database = "robs-kewl-datalake-test-datalake-main-database", table_name = "robs-kewl-datalake-test_drop_order_items", transformation_ctx = "datasource0"]
 ## @return: datasource0
 ## @inputs: []
-datasource0 = glueContext.create_dynamic_frame.from_catalog(database = args['database-name'], table_name = args['table-name'], transformation_ctx = "datasource0")
+datasource0 = glueContext.create_dynamic_frame.from_catalog(database = args['database_name'], table_name = args['table_name'], transformation_ctx = "datasource0")
 ## @type: ApplyMapping
 ## @args: [mapping = [("order_id", "string", "order_id", "string"), ("order_item_id", "long", "order_item_id", "long"), ("product_id", "string", "product_id", "string"), ("seller_id", "string", "seller_id", "string"), ("shipping_limit_date", "string", "shipping_limit_date", "string"), ("price", "double", "price", "double"), ("freight_value", "double", "freight_value", "double")], transformation_ctx = "applymapping1"]
 ## @return: applymapping1

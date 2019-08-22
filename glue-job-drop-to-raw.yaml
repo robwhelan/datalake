@@ -26,11 +26,11 @@ Resources:
         PythonVersion: 3
         ScriptLocation: s3://datalake-rww/glue-scripts/drop-to-raw.py
       DefaultArguments:
-        "--database-name": !Ref pDatabaseName
-        '--table-name': !Ref pTableName
+        "--database_name": !Ref pDatabaseName
+        '--table_name': !Ref pTableName
         "--job-bookmark-option": "job-bookmark-enable"
-        "--data-partition": !Ref pDataPartition
-        "--downstream-bucket": !Ref pDownstreamBucket
+        "--data_partition": !Ref pDataPartition
+        "--downstream_bucket": !Ref pDownstreamBucket
       Description: Convert incoming CSV to Parquet.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
