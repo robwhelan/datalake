@@ -18,5 +18,5 @@
   {
     "ParameterKey": "pDownstreamBucket",
     "ParameterValue": "robs-kewl-datalake-test-raw-773548596459"
-  },
+  }
 ]

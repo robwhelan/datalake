@@ -28,10 +28,17 @@ $ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzon
 ```
 
 4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone.\
-
-
+```bash
+$ aws cloudformation create-stack --stack-name glue-job-drop-to-raw \
+  --template-url https://datalake-rww.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
+  --parameters file://glue-job-drop-to-raw-parameters.json
+```
 
 5. Run the glue job. This will move data into the raw zone, and set up for an hourly schedule.
+```bash
+$ aws glue start-job-run --job-name robs-kewl-datalake-test-glue-job-drop-to-raw
+```
+
 6. Run the second crawler -- the one for the raw zone. This will create a metadata table for the raw zone.
 7. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
 8. Run the glue job. This will move the new dataset into the curated zone.
