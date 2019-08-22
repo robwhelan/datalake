@@ -4,6 +4,7 @@ Parameters:
   pProjectName:
     Type: String
     Description: the ARN of the dead letter queue
+Resources:
   rGlueJobDropToRaw:
     Type: AWS::Glue::Job
     Properties:
