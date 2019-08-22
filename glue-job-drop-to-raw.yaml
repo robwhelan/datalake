@@ -3,7 +3,19 @@ Description: A job that moves data from the drop zone to the raw zone.
 Parameters:
   pProjectName:
     Type: String
-    Description: the project anme
+    Description: the project Name
+  pDatabaseName:
+    Type: String
+    Description: the glue database created for this dataset
+  pTableName:
+    Type: String
+    Description: the source table for this data.
+  pDataPartition:
+    Type: String
+    Description: the partition for where the file will reside in S3 ... example, "orders"
+  pDownstreamBucket:
+    Type: String
+    Description: the bucket downstream of hte drop zone bucket.
 Resources:
   rGlueJobDropToRaw:
     Type: AWS::Glue::Job
@@ -12,11 +24,13 @@ Resources:
       Command:
         Name: glueetl #default for apache spark jobs
         PythonVersion: 3
-        ScriptLocation: s3://datalake-rww/glue-scripts/test.py
+        ScriptLocation: s3://datalake-rww/glue-scripts/drop-to-raw.py
       DefaultArguments:
-        "--database-name": !Sub '${pProjectName}-datalake-main-database'
-        '--table-name': 'person'
+        "--database-name": !Ref pDatabaseName
+        '--table-name': !Ref pTableName
         "--job-bookmark-option": "job-bookmark-enable"
+        "--data-partition": !Ref pDataPartition
+        "--downstream-bucket": !Ref pDownstreamBucket
       Description: Convert incoming CSV to Parquet.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin

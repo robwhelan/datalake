@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "pProjectName",
+    "ParameterValue": "robs-kewl-datalake-test"
+  },
+  {
+    "ParameterKey": "pDatabaseName",
+    "ParameterValue": "robs-kewl-datalake-test-datalake-main-database"
+  },
+  {
+    "ParameterKey": "pTableName",
+    "ParameterValue": "robs-kewl-datalake-test_drop_order_items"
+  },
+  {
+    "ParameterKey": "pDataPartition",
+    "ParameterValue": "orders"
+  },
+  {
+    "ParameterKey": "pDownstreamBucket",
+    "ParameterValue": "robs-kewl-datalake-test-raw-773548596459"
+  },
+]

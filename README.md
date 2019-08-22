@@ -11,7 +11,7 @@ Example:
 $ bash create-datalake.sh robs-kewl-stack-5 https://datalake-rww.s3.amazonaws.com/main.yaml
 ```
 
-2. Upload some data to the drop zone.
+2. Upload some data to the drop zone. This upload is ~50MB and should take about a minute or two.
 The source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
 ```bash
 $ bash upload-data.sh <path-to-source-data> <your-drop-zone-bucket...output from the main.yaml stack>
@@ -23,7 +23,14 @@ $ bash upload-data.sh ../Downloads/brazilian-ecommerce/ s3://robs-kewl-datalake-
 ```
 
 3. Run the first crawler (drop zone crawler). It will create a metadata table for the drop zone.
-4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone.
+```bash
+$ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzone
+```
+
+4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone.\
+
+
+
 5. Run the glue job. This will move data into the raw zone, and set up for an hourly schedule.
 6. Run the second crawler -- the one for the raw zone. This will create a metadata table for the raw zone.
 7. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
