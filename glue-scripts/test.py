@@ -6,7 +6,11 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 
 ## @params: [JOB_NAME]
-args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+args = getResolvedOptions(sys.argv, [
+    'JOB_NAME',
+    'database-name', #array of arguemnts you want to grab.
+    'table-name']
+    )
 
 sc = SparkContext()
 glueContext = GlueContext(sc)

@@ -3,7 +3,7 @@ Description: A job that moves data from the drop zone to the raw zone.
 Parameters:
   pProjectName:
     Type: String
-    Description: the ARN of the dead letter queue
+    Description: the project anme
 Resources:
   rGlueJobDropToRaw:
     Type: AWS::Glue::Job
@@ -14,9 +14,9 @@ Resources:
         PythonVersion: 3
         ScriptLocation: s3://datalake-rww/glue-scripts/test.py
       DefaultArguments:
-        -
-          '--database-name': !Sub '${pProjectName}-datalake-main-database'
-          '--table-name': 'person'
+        "--database-name": !Sub '${pProjectName}-datalake-main-database'
+        '--table-name': 'person'
+        "--job-bookmark-option": "job-bookmark-enable"
       Description: Convert incoming CSV to Parquet.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
