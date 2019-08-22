@@ -1,0 +1,10 @@
+#sends data to data lake. Provide the drop zone bucket as the first argument to the command line.
+aws s3 cp $1'olist_customers_dataset.csv' $2'customers/'
+aws s3 cp $1'olist_geolocation_dataset.csv' $2'geolocation/'
+aws s3 cp $1'olist_order_items_dataset.csv' $2'order-items/'
+aws s3 cp $1'olist_order_payments_dataset.csv' $2'order-payments/'
+aws s3 cp $1'olist_order_reviews_dataset.csv' $2'order-reviews/'
+aws s3 cp $1'olist_orders_dataset.csv' $2'orders-dataset/'
+aws s3 cp $1'olist_products_dataset.csv' $2'products/'
+aws s3 cp $1'olist_sellers_dataset.csv' $2'sellers/'
+aws s3 cp $1'product_category_name_translation.csv' $2'product-category-name/'

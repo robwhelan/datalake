@@ -1,6 +1,27 @@
 How:
 1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
+
+from the root directory:
+```bash
+$ bash create-datalake.sh <name-of-your-stack> <https path to main.yaml>
+```
+
+Example:
+```bash
+$ bash create-datalake.sh robs-kewl-stack-5 https://datalake-rww.s3.amazonaws.com/main.yaml
+```
+
 2. Upload some data to the drop zone.
+The source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
+```bash
+$ bash upload-data.sh <path-to-source-data> <your-drop-zone-bucket...output from the main.yaml stack>
+```
+
+Example:
+```bash
+$ bash upload-data.sh ../Downloads/brazilian-ecommerce/ s3://robs-kewl-datalake-test-drop-773548596459/
+```
+
 3. Run the first crawler (drop zone crawler). It will create a metadata table for the drop zone.
 4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone.
 5. Run the glue job. This will move data into the raw zone, and set up for an hourly schedule.
