@@ -11,24 +11,11 @@ Parameters:
       Command:
         Name: glueetl #default for apache spark jobs
         PythonVersion: 3
-        ScriptLocation: #s3 location for the script...
-
-      #Connections:
-    #    ConnectionsList
+        ScriptLocation: s3://datalake-rww/glue-scripts/test.py
       DefaultArguments:
         -
           '--database-name': !Sub '${pProjectName}-datalake-main-database'
-          '--table-name':
+          '--table-name': 'person'
       Description: Convert incoming CSV to Parquet.
-      #ExecutionProperty:
-      #  ExecutionProperty
-      #GlueVersion: String
-      #LogUri: String
-      #MaxCapacity: Double
-      #MaxRetries: Double
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
-      #NumberOfWorkers: Integer
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
-      #SecurityConfiguration: String
-      #Tags: Json
-      #WorkerType: String
