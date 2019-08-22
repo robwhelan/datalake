@@ -4,18 +4,12 @@ Parameters:
   pDeadLetterQueueArn:
     Type: String
     Description: the ARN of the dead letter queue
-  pDownstreamZone:
-    Type: String
-    Description: the next zone after this one
   pKeyAdministrator:
     Type: String
     Description: ARN of key administrator role.
   pKeyUser:
     Type: String
     Description: ARN of key user role.
-  pLoggingBucket:
-    Type: String
-    Description: the bucket to which all logs will be sent
   pProjectName:
     Type: String
     Description: The lowercase, overall name of the project which will be used for naming and for tagging.
@@ -72,17 +66,13 @@ Resources:
             Transitions:
               - StorageClass: !Ref pTransitionClass
                 TransitionInDays: !Ref pTransitionInDays
-      LoggingConfiguration:
-        DestinationBucketName: !Ref pLoggingBucket
-        LogFilePrefix: !Sub 's3-access-logs/${pZone}/'
-      NotificationConfiguration: #publish to an sqs queue on every new event.
-        QueueConfigurations:
-          - Event: 's3:ObjectCreated:*'
-            Queue: !GetAtt rSqsQueue.Outputs.rQueueArn
+      #LoggingConfiguration:
+      #  DestinationBucketName: !Ref pLoggingBucket
+      #  LogFilePrefix: !Sub 's3-access-logs/${pZone}/'
+      #NotificationConfiguration: #publish to an sqs queue on every new event.
+      #  QueueConfigurations:
+      #    - Event: 's3:ObjectCreated:*'
+      #      Queue: !GetAtt rSqsQueue.Outputs.rQueueArn
 Outputs:
   oS3Bucket:
     Value: !Ref rS3Bucket
-  oSqsQueueUrl:
-    Value: !Ref rSqsQueue
-  oSqsQueueArn:
-    Value: !GetAtt rSqsQueue.Outputs.rQueueArn
