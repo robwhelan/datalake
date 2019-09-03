@@ -1,10 +1,12 @@
 How:
-1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers. Be sure to edit the file `main-template-parameters.json`.
+1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
 
 from the root directory:
 ```bash
 $ bash create-datalake.sh <name-of-your-stack> <https path to main.yaml>
 ```
+Be sure to edit the file `main-template-parameters.json`.
+TODO: change this to accept parameters to the command, instead of editing the parameters file.
 
 Example:
 ```bash

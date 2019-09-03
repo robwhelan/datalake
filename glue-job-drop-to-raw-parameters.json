@@ -1,22 +1,22 @@
 [
   {
     "ParameterKey": "pProjectName",
-    "ParameterValue": "robs-kewl-datalake-test"
+    "ParameterValue": "toyota-demo"
   },
   {
     "ParameterKey": "pDatabaseName",
-    "ParameterValue": "robs-kewl-datalake-test-datalake-main-database"
+    "ParameterValue": "toyota-demo-datalake-main-database"
   },
   {
     "ParameterKey": "pTableName",
-    "ParameterValue": "robs-kewl-datalake-test_drop_order_items"
+    "ParameterValue": "toyota-demo_drop_closed_deals"
   },
   {
     "ParameterKey": "pDataPartition",
-    "ParameterValue": "orders"
+    "ParameterValue": "closed_deals"
   },
   {
     "ParameterKey": "pDownstreamBucket",
-    "ParameterValue": "robs-kewl-datalake-test-raw-773548596459"
+    "ParameterValue": "toyota-demo-raw-773548596459"
   }
 ]

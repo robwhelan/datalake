@@ -60,3 +60,4 @@ Resources:
       Targets:
         S3Targets:
           - Path: !Sub 's3://${pCuratedZoneBucket}/'
+#TODO: add tags and other metadata to the tables. Can you do this here, or after the table is creqated?
