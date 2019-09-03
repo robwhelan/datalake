@@ -35,3 +35,4 @@ Resources:
       Description: Convert incoming CSV to Parquet.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+#TODO: create the trigger that makes drop zone job run hourly.

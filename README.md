@@ -22,7 +22,7 @@ Example:
 $ bash upload-data.sh ../Downloads/brazilian-ecommerce/ s3://robs-kewl-datalake-test-drop-773548596459/
 ```
 
-3. Run the first crawler (drop zone crawler). It will create a metadata table for the drop zone.
+3. Run the first crawler (drop zone crawler). It will create metadata tables (one for each partition) for the drop zone.
 ```bash
 $ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzone
 ```
@@ -39,9 +39,27 @@ $ aws cloudformation create-stack --stack-name glue-job-drop-to-raw \
 $ aws glue start-job-run --job-name robs-kewl-datalake-test-glue-job-drop-to-raw
 ```
 
-6. Run the second crawler -- the one for the raw zone. This will create a metadata table for the raw zone.
+6. Run the second crawler -- the one for the raw zone. This will create a metadata table for the raw zone. This is defined in etl.yaml.
+```bash
+$ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-rawzone
+```
+
 7. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
+```bash
+$ aws cloudformation create-stack --stack-name glue-job-raw-to-curated \
+  --template-url https://datalake-rww.s3.amazonaws.com/glue-job-raw-to-curated.yaml \
+  --parameters file://glue-job-raw-to-curated-parameters.json
+```
+
 8. Run the glue job. This will move the new dataset into the curated zone.
+
+9. Turn on a redshift cluster
+TODO: cloudformation template for redshift cluster.
+
+10. Query editor:
+a. create table that matches the schema from S3 curated zone.
+b. copy data from s3 into redshift table.
+c. Do some queries -- aggregate # of deals and sum of deal value per seller; average review per seller / per SDR.
 
 Design Principles
 1. Send only two stacks: 1 for your prod account, 1 for your security account.

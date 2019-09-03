@@ -17,7 +17,7 @@ Resources:
         "--database-name": !Sub '${pProjectName}-datalake-main-database'
         '--table-name': 'person'
         "--job-bookmark-option": "job-bookmark-enable"
-      Description: Convert incoming CSV to Parquet.
+      Description: Join a few tables to create a new one, ready to be imported into Redshift.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
-#TODO: ADD TRIGGER
+#TODO: create the trigger that makes raw zone job run whenever the previous run works.
