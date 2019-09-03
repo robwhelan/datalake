@@ -1,5 +1,5 @@
 How:
-1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
+1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers. Be sure to edit the file `main-template-parameters.json`.
 
 from the root directory:
 ```bash
