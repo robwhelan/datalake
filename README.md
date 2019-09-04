@@ -29,36 +29,39 @@ $ bash upload-data.sh ../Downloads/brazilian-ecommerce/ s3://robs-kewl-datalake-
 $ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzone
 ```
 
-4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone.\
+4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone. For each Table in this Database, update the parameters 'table name' and 'partition', then run the stack -- be sure to name the stack something different each time.
 ```bash
 $ aws cloudformation create-stack --stack-name glue-job-drop-to-raw \
   --template-url https://datalake-rww.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
   --parameters file://glue-job-drop-to-raw-parameters.json
 ```
+TODO: automate this to create a new job for each partition -- each table that came out of the drop zone. Because each data set will have different treatment. OR, you'd have to manually modify the glue job to just do every partition while it is up... write a loop inside the partition.
 
-5. Run the glue job. This will move data into the raw zone, and set up for an hourly schedule.
+5. Run the glue job for each partition (table name). This will move data into the raw zone, and set up for an hourly schedule.
 ```bash
-$ aws glue start-job-run --job-name robs-kewl-datalake-test-glue-job-drop-to-raw
+$ bash run-raw-glue-jobs.sh
 ```
 
-6. Run the second crawler -- the one for the raw zone. This will create a metadata table for the raw zone. This is defined in etl.yaml.
+6. Wait until the first transform jobs are done. Run the second crawler -- the one for the raw zone. This will create metadata tables for the raw zone. This is defined in etl.yaml.
 ```bash
 $ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-rawzone
 ```
 
-7. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
+7. Explore your analytics-ready data in Athena.
+
+8. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
 ```bash
 $ aws cloudformation create-stack --stack-name glue-job-raw-to-curated \
   --template-url https://datalake-rww.s3.amazonaws.com/glue-job-raw-to-curated.yaml \
   --parameters file://glue-job-raw-to-curated-parameters.json
 ```
 
-8. Run the glue job. This will move the new dataset into the curated zone.
+9. Run the glue job. This will move the new dataset into the curated zone.
 
-9. Turn on a redshift cluster
+10. Turn on a redshift cluster
 TODO: cloudformation template for redshift cluster.
 
-10. Query editor:
+11. Query editor:
 a. create table that matches the schema from S3 curated zone.
 b. copy data from s3 into redshift table.
 c. Do some queries -- aggregate # of deals and sum of deal value per seller; average review per seller / per SDR.

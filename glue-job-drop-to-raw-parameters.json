@@ -9,11 +9,11 @@
   },
   {
     "ParameterKey": "pTableName",
-    "ParameterValue": "toyota-demo_drop_closed_deals"
+    "ParameterValue": "toyota-demo_drop_order_reviews"
   },
   {
     "ParameterKey": "pDataPartition",
-    "ParameterValue": "closed_deals"
+    "ParameterValue": "order-reviews"
   },
   {
     "ParameterKey": "pDownstreamBucket",
