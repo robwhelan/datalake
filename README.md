@@ -10,8 +10,13 @@ TODO: change this to accept parameters to the command, instead of editing the pa
 
 Example:
 ```bash
-$ bash create-datalake.sh robs-kewl-stack-5 https://datalake-rww.s3.amazonaws.com/main.yaml
+$ bash create-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/main.yaml
 ```
+to update:
+```bash
+$ bash update-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/main.yaml
+```
+
 
 2. Upload some data to the drop zone. This upload is ~50MB and should take about a minute or two.
 The source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
@@ -44,7 +49,7 @@ $ bash run-raw-glue-jobs.sh
 
 6. Wait until the first transform jobs are done. Run the second crawler -- the one for the raw zone. This will create metadata tables for the raw zone. This is defined in etl.yaml.
 ```bash
-$ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-rawzone
+$ aws glue start-crawler --name toyota-demo-datalake-crawler-rawzone
 ```
 
 7. Explore your analytics-ready data in Athena.

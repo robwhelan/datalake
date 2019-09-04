@@ -49,6 +49,7 @@ Resources:
           - Path: !Sub 's3://${pRawZoneBucket}/order-items/'
           - Path: !Sub 's3://${pRawZoneBucket}/order-reviews/'
           - Path: !Sub 's3://${pRawZoneBucket}/sellers/'
+          #TODO: get rid of hard-coding of s3 targets.
   rGlueCrawlerCuratedZone:
     Type: AWS::Glue::Crawler
     Properties:

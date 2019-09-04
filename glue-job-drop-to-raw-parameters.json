@@ -9,14 +9,18 @@
   },
   {
     "ParameterKey": "pTableName",
-    "ParameterValue": "toyota-demo_drop_closed_deals"
+    "ParameterValue": "toyota-demo_drop_sellers"
   },
   {
     "ParameterKey": "pDataPartition",
-    "ParameterValue": "closed-deals"
+    "ParameterValue": "sellers"
   },
   {
     "ParameterKey": "pDownstreamBucket",
     "ParameterValue": "toyota-demo-raw-773548596459"
+  },
+  {
+    "ParameterKey": "pScriptLocation",
+    "ParameterValue": "s3://datalake-rww/glue-scripts/drop-to-raw-sellers.py"
   }
 ]

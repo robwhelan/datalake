@@ -16,6 +16,9 @@ Parameters:
   pDownstreamBucket:
     Type: String
     Description: the bucket downstream of hte drop zone bucket.
+  pScriptLocation:
+    Type: String
+    Description: the script location for the etl.
 Resources:
   rGlueJobDropToRaw:
     Type: AWS::Glue::Job
@@ -25,7 +28,7 @@ Resources:
       Command:
         Name: glueetl #default for apache spark jobs
         PythonVersion: 3
-        ScriptLocation: s3://datalake-rww/glue-scripts/drop-to-raw-order-items.py
+        ScriptLocation: !Ref pScriptLocation
       DefaultArguments:
         "--database_name": !Ref pDatabaseName
         '--table_name': !Ref pTableName
