@@ -25,7 +25,7 @@ Resources:
       Command:
         Name: glueetl #default for apache spark jobs
         PythonVersion: 3
-        ScriptLocation: s3://datalake-rww/glue-scripts/drop-to-raw.py
+        ScriptLocation: s3://datalake-rww/glue-scripts/drop-to-raw-order-items.py
       DefaultArguments:
         "--database_name": !Ref pDatabaseName
         '--table_name': !Ref pTableName
