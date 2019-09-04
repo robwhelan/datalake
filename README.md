@@ -1,6 +1,9 @@
 TODO:
-remove data from s3 and start over... the job bookmarking is preventing data from being re-run.
-
+make sure the code to join all the tables is correct and properly referenced by the glue job.
+write the glue trigger to tell the curation job to kick off when 4 glue jobs are done. (or 3, everything but the seller id table)
+make sure the crawler for the curated zone is looking at the correct path.
+write the redshift table definition language.
+then, write a script to COPY stuff into redshift table.
 
 How:
 1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
