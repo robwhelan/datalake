@@ -1,3 +1,7 @@
+TODO:
+remove data from s3 and start over... the job bookmarking is preventing data from being re-run.
+
+
 How:
 1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
 
@@ -26,7 +30,7 @@ $ bash upload-data.sh <path-to-source-data> <your-drop-zone-bucket...output from
 
 Example:
 ```bash
-$ bash upload-data.sh ../Downloads/brazilian-ecommerce/ s3://robs-kewl-datalake-test-drop-773548596459/
+$ bash upload-data.sh ../ecommerce-data/ toyota-demo-drop-773548596459
 ```
 
 3. Run the first crawler (drop zone crawler). It will create metadata tables (one for each partition) for the drop zone.
