@@ -5,6 +5,8 @@ make sure the crawler for the curated zone is looking at the correct path.
 write the redshift table definition language.
 then, write a script to COPY stuff into redshift table.
 
+WRITE THE WHOLE DEMO SCRIPT.
+
 How:
 1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
 
