@@ -1,11 +1,9 @@
 TODO:
-make sure the code to join all the tables is correct and properly referenced by the glue job.
 write the glue trigger to tell the curation job to kick off when 4 glue jobs are done. (or 3, everything but the seller id table)
 make sure the crawler for the curated zone is looking at the correct path.
-write the redshift table definition language.
-then, write a script to COPY stuff into redshift table.
-
-WRITE THE WHOLE DEMO SCRIPT.
+refactor out the glue databases -- in etl.yaml, make one database for each zone. Rename the reference in crawlers to ponit to the specific zone.
+In the glue jobs, double check the databases are correctly named (different databases now, one for each zone)
+TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
 
 How:
 1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
@@ -73,7 +71,6 @@ $ aws cloudformation create-stack --stack-name glue-job-raw-to-curated \
 9. Run the glue job. This will move the new dataset into the curated zone.
 
 10. Turn on a redshift cluster
-TODO: cloudformation template for redshift cluster.
 
 11. Query editor:
 a. create table that matches the schema from S3 curated zone.

@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Redshift infrastructure. Redshift 4-node cluster and .
+Parameters:
+  pProjectName:
+    Type: String
+  pDropZoneBucket:
+    Type: String
+  pRawZoneBucket:
+    Type: String
+  pCuratedZoneBucket:
+    Type: String
+  Resources:
+    Type: AWS::Redshift::Cluster
+    Properties:
+      AllowVersionUpgrade: Boolean
+      AutomatedSnapshotRetentionPeriod: Integer
+      AvailabilityZone: String
+      ClusterIdentifier: String
+      ClusterParameterGroupName: String
+      ClusterSecurityGroups:
+        - String
+      ClusterSubnetGroupName: String
+      ClusterType: String
+      ClusterVersion: String
+      DBName: String
+      ElasticIp: String
+      Encrypted: Boolean
+      HsmClientCertificateIdentifier: String
+      HsmConfigurationIdentifier: String
+      IamRoles:
+        - String
+      KmsKeyId: String
+      LoggingProperties:
+        LoggingProperties
+      MasterUsername: String
+      MasterUserPassword: String
+      NodeType: String
+      NumberOfNodes: Integer
+      OwnerAccount: String
+      Port: Integer
+      PreferredMaintenanceWindow: String
+      PubliclyAccessible: Boolean
+      SnapshotClusterIdentifier: String
+      SnapshotIdentifier: String
+      Tags:
+        - Tag
+      VpcSecurityGroupIds:
+        - String
