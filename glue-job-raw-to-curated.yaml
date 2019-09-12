@@ -4,9 +4,6 @@ Parameters:
   pProjectName:
     Type: String
     Description: the project Name
-  pTableName:
-    Type: String
-    Description: name of the table
 Resources:
   rGlueJobDropToRaw:
     Type: AWS::Glue::Job
@@ -18,7 +15,7 @@ Resources:
         ScriptLocation: s3://datalake-rww/glue-scripts/raw-to-curated-seller-performance.py
       DefaultArguments:
         "--database-name": !Sub '${pProjectName}-datalake-main-database'
-        '--table-name': 'person'
+        '--table-name': 'fill_this_in_later'
         "--job-bookmark-option": "job-bookmark-enable"
       Description: Join a few tables to create a new one, ready to be imported into Redshift.
       Name: !Sub '${pProjectName}-glue-job-raw-to-curated-seller-performance'
