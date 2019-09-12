@@ -43,7 +43,7 @@ $ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzon
 
 4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone. For each Table in this Database, update the parameters 'table name' and 'partition', then run the stack -- be sure to name the stack something different each time.
 ```bash
-$ aws cloudformation create-stack --stack-name glue-job-drop-to-raw \
+$ aws cloudformation create-stack --stack-name glue-job-drop-to-raw-closed-deals-2 \
   --template-url https://datalake-rww.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
   --parameters file://glue-job-drop-to-raw-parameters.json
 ```
@@ -54,9 +54,10 @@ TODO: automate this to create a new job for each partition -- each table that ca
 $ bash run-raw-glue-jobs.sh
 ```
 
+TODO:::::
 6. Wait until the first transform jobs are done. Run the second crawler -- the one for the raw zone. This will create metadata tables for the raw zone. This is defined in etl.yaml.
 ```bash
-$ aws glue start-crawler --name toyota-demo-datalake-crawler-rawzone
+$ aws glue start-crawler --name datalake-demo-datalake-crawler-rawzone
 ```
 
 7. Explore your analytics-ready data in Athena.

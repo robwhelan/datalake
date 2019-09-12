@@ -1,26 +1,26 @@
 [
   {
     "ParameterKey": "pProjectName",
-    "ParameterValue": "toyota-demo"
+    "ParameterValue": "datalake-demo"
   },
   {
     "ParameterKey": "pDatabaseName",
-    "ParameterValue": "toyota-demo-datalake-main-database"
+    "ParameterValue": "datalake-demo-datalake-main-database"
   },
   {
     "ParameterKey": "pTableName",
-    "ParameterValue": "toyota-demo_drop_sellers"
+    "ParameterValue": "datalake-demo_drop_closed_deals"
   },
   {
     "ParameterKey": "pDataPartition",
-    "ParameterValue": "sellers"
+    "ParameterValue": "closed-deals"
   },
   {
     "ParameterKey": "pDownstreamBucket",
-    "ParameterValue": "toyota-demo-raw-773548596459"
+    "ParameterValue": "datalake-demo-raw-773548596459"
   },
   {
     "ParameterKey": "pScriptLocation",
-    "ParameterValue": "s3://datalake-rww/glue-scripts/drop-to-raw-sellers.py"
+    "ParameterValue": "s3://datalake-rww/glue-scripts/drop-to-raw-closed-deals.py"
   }
 ]

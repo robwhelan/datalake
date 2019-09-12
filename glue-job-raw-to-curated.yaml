@@ -6,7 +6,7 @@ Parameters:
     Description: the project Name
   pTableName:
     Type: String
-    Description: name of the table 
+    Description: name of the table
 Resources:
   rGlueJobDropToRaw:
     Type: AWS::Glue::Job
@@ -23,28 +23,3 @@ Resources:
       Description: Join a few tables to create a new one, ready to be imported into Redshift.
       Name: !Sub '${pProjectName}-glue-job-raw-to-curated-seller-performance'
       Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
-#TODO: create the trigger that makes raw zone job run whenever the previous run works.
-  MyJobTrigger:
-    Type: AWS::Glue::Trigger
-    Properties:
-      Name: "MyJobTrigger"
-      Type: "CONDITIONAL"
-      Description: when the preceding raw formatting jobs complete, this job runs - it joins a few tables.
-      Actions:
-        - JobName: !Ref rGlueJobDropToRaw
-          Arguments:
-            "--job-bookmark-option": "job-bookmark-enable"
-      Predicate:
-        Conditions:
-          - LogicalOperator: EQUALS
-            JobName: !Ref #closed deals job
-            State: SUCCEEDED
-          - LogicalOperator: EQUALS
-            JobName: !Ref MyJob
-            State: SUCCEEDED
-          - LogicalOperator: EQUALS
-            JobName: !Ref MyJob
-            State: SUCCEEDED
-          - LogicalOperator: EQUALS
-            JobName: !Ref MyJob
-            State: SUCCEEDED
