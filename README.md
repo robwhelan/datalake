@@ -1,3 +1,5 @@
+![architecture](https://github.com/robwhelan/datalake/blob/master/Cloudreach%20Datalake%20Accelerator.png)
+
 TODO:
 write the glue trigger to tell the curation job to kick off when 4 glue jobs are done. (or 3, everything but the seller id table)
 make sure the crawler for the curated zone is looking at the correct path.
