@@ -72,6 +72,7 @@ $ aws cloudformation create-stack --stack-name glue-job-raw-to-curated \
 9. Run the glue job. This will move the new dataset into the curated zone.
 
 10. Turn on a redshift cluster
+Make sure the security group is there.
 
 11. Query editor:
 a. create table that matches the schema from S3 curated zone.
