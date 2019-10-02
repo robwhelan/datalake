@@ -12,6 +12,38 @@ Parameters:
 Resources:
   #glue service role. Reference the glue managed policy.
   #then, create a custom policy that allows glue to read and write to the s3 buckets.
+  rGlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: A role that gives Glue jobs and crawlers basic service permissions.
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      #Policies:
+      #  - Policy
+      RoleName: BaseGlueServiceRole
+      Tags:
+        - Environment
+          Security
+
+  rGlueS3Policy:
+    Type: AWS::IAM::Policy
+    DependsOn: rGlueServiceRole
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+            Resource:
+              - !Sub 'arn:aws:s3:::${pDropZoneBucket}/*'
+              - !Sub 'arn:aws:s3:::${pRawZoneBucket}/*'
+              - !Sub 'arn:aws:s3:::${pCuratedZoneBucket}/*'
+      PolicyName: Inline policy to allow Glue read/write access to the appropriate S3 buckets in this lake.
+      Roles:
+        - !Ref rGlueServiceRole
 
   rGlueDatabase:
     Type: AWS::Glue::Database
