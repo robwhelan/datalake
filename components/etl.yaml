@@ -49,7 +49,7 @@ Resources:
               - !Sub 'arn:aws:s3:::${pDropZoneBucket}/*'
               - !Sub 'arn:aws:s3:::${pRawZoneBucket}/*'
               - !Sub 'arn:aws:s3:::${pCuratedZoneBucket}/*'
-      PolicyName: Inline policy to allow Glue read/write access to the appropriate S3 buckets in this lake.
+      PolicyName: glueServiceRole-read-write-s3
       Roles:
         - !Ref rGlueServiceRole
 
