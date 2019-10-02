@@ -10,6 +10,9 @@ Parameters:
   pCuratedZoneBucket:
     Type: String
 Resources:
+  #glue service role. Reference the glue managed policy.
+  #then, create a custom policy that allows glue to read and write to the s3 buckets.
+
   rGlueDatabase:
     Type: AWS::Glue::Database
     Properties:

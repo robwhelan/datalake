@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: VPC infrastructure
+Description: Various IAM roles for the datalake project.
 Parameters:
   pProjectName:
     Type: String
