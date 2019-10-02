@@ -18,7 +18,7 @@ Resources:
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
-        pTransitionInDays: 7
+        pTransitionInDays: 30
         pZone: drop
       TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
       TimeoutInMinutes: 15

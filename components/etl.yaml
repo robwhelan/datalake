@@ -18,12 +18,10 @@ Resources:
       Description: A role that gives Glue jobs and crawlers basic service permissions.
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
-      #Policies:
-      #  - Policy
       RoleName: BaseGlueServiceRole
       Tags:
-        - Environment
-          Security
+        - Key: Environment
+          Value: Security
 
   rGlueS3Policy:
     Type: AWS::IAM::Policy
