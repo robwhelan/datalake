@@ -6,7 +6,7 @@ Parameters:
     Description: overall project name which will be used for tags and resource naming.
   pS3TemplateLocation:
     Type: String
-    Description: S3 location for the datalake files. Example: 'https://datalake-rww.s3.amazonaws.com'
+    Description: S3 location for the datalake files Example https://datalake-rww.s3.amazonaws.com
 Resources:
   rDropZone:
     Type: AWS::CloudFormation::Stack
@@ -20,7 +20,7 @@ Resources:
         pTransitionClass: GLACIER
         pTransitionInDays: 30
         pZone: drop
-      TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
+      TemplateURL: !Sub '${pS3TemplateLocation}/components/zone.yaml'
       TimeoutInMinutes: 15
 
   rRawZone:
@@ -35,7 +35,7 @@ Resources:
         pTransitionClass: GLACIER
         pTransitionInDays: 7
         pZone: raw
-      TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
+      TemplateURL: !Sub '${pS3TemplateLocation}/components/zone.yaml'
       TimeoutInMinutes: 15
 
   rCuratedZone:
@@ -50,7 +50,7 @@ Resources:
         pTransitionClass: GLACIER
         pTransitionInDays: 7
         pZone: curated
-      TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
+      TemplateURL: !Sub '${pS3TemplateLocation}/components/zone.yaml'
       TimeoutInMinutes: 15
 
   #main database for data catalog.
@@ -66,7 +66,7 @@ Resources:
         pDropZoneBucket: !GetAtt rDropZone.Outputs.oS3Bucket
         pRawZoneBucket: !GetAtt rRawZone.Outputs.oS3Bucket
         pCuratedZoneBucket: !GetAtt rCuratedZone.Outputs.oS3Bucket
-      TemplateURL: !Sub '{$pS3TemplateLocation}/components/etl.yaml
+      TemplateURL: !Sub '${pS3TemplateLocation}/components/etl.yaml'
       TimeoutInMinutes: 5
 
   #cloudtrail logging
@@ -87,7 +87,7 @@ Resources:
       Parameters:
         pProjectName: !Ref pProjectName
         pQueueName: !Sub '${pProjectName}-dead-letter-queue'
-      TemplateURL: !Sub '{$pS3TemplateLocation}/components/queue-dead-letter.yaml
+      TemplateURL: !Sub '${pS3TemplateLocation}/components/queue-dead-letter.yaml'
       TimeoutInMinutes: 5
 
   #central logging bucket for any logging event - s3 access logging, cloudtrail.
