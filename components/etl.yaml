@@ -53,18 +53,34 @@ Resources:
       Roles:
         - !Ref rGlueServiceRole
 
-  rGlueDatabase:
+  rGlueDatabaseDrop:
     Type: AWS::Glue::Database
     Properties:
       CatalogId: !Ref AWS::AccountId
       DatabaseInput:
-          Description: Central virtual database for all tables in the data lake.
+          Description: Central virtual database for all tables in the drop zone of the data lake.
           #LocationUri: String
-          Name: !Sub '${pProjectName}-datalake-main-database'
+          Name: !Sub '${pProjectName}-datalake-drop-zone-database'
+  rGlueDatabaseRaw:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+          Description: Central virtual database for all tables in the raw zone of the data lake.
+          #LocationUri: String
+          Name: !Sub '${pProjectName}-datalake-raw-zone-database'
+  rGlueDatabaseCurated:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+          Description: Central virtual database for all tables in the curated zone of the data lake.
+          #LocationUri: String
+          Name: !Sub '${pProjectName}-datalake-curated-zone-database'
   rGlueCrawlerDropZone:
     Type: AWS::Glue::Crawler
     Properties:
-      DatabaseName: !Ref rGlueDatabase
+      DatabaseName: !Ref rGlueDatabaseDrop
       Description: Crawls data in the drop zone to establish table
       Name: !Sub '${pProjectName}-datalake-crawler-dropzone'
       Role: !GetAtt rGlueServiceRole.Arn
@@ -78,7 +94,7 @@ Resources:
   rGlueCrawlerRawZone:
     Type: AWS::Glue::Crawler
     Properties:
-      DatabaseName: !Ref rGlueDatabase
+      DatabaseName: !Ref rGlueDatabaseRaw
       Description: Crawls data to establish table in the raw zone - general analytics.
       Name: !Sub '${pProjectName}-datalake-crawler-rawzone'
       Role: !GetAtt rGlueServiceRole.Arn
@@ -88,15 +104,12 @@ Resources:
       TablePrefix: !Sub '${pProjectName}_raw_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pRawZoneBucket}/closed-deals/'
-          - Path: !Sub 's3://${pRawZoneBucket}/order-items/'
-          - Path: !Sub 's3://${pRawZoneBucket}/order-reviews/'
-          - Path: !Sub 's3://${pRawZoneBucket}/sellers/'
+          - Path: !Sub 's3://${pRawZoneBucket}/'
           #TODO: get rid of hard-coding of s3 targets.
   rGlueCrawlerCuratedZone:
     Type: AWS::Glue::Crawler
     Properties:
-      DatabaseName: !Ref rGlueDatabase
+      DatabaseName: !Ref rGlueDatabaseCurated
       Description: Crawls data to establish table in the curated zone for a data mart.
       Name: !Sub '${pProjectName}-datalake-crawler-curatedzone'
       Role: !GetAtt rGlueServiceRole.Arn
