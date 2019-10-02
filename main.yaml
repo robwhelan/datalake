@@ -8,15 +8,6 @@ Parameters:
     Type: String
     Description: S3 location for the datalake files. Example: 'https://datalake-rww.s3.amazonaws.com'
 Resources:
-  #IAM to produce the roles.
-  rIam:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        pProjectName: !Ref pProjectName
-      TemplateURL: !Sub '{$pS3TemplateLocation}/components/iam.yaml'
-      TimeoutInMinutes: 5
-
   rDropZone:
     Type: AWS::CloudFormation::Stack
     DependsOn:

@@ -59,7 +59,7 @@ Resources:
       DatabaseName: !Ref rGlueDatabase
       Description: Crawls data in the drop zone to establish table
       Name: !Sub '${pProjectName}-datalake-crawler-dropzone'
-      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      Role: !GetAtt rGlueServiceRole.Arn
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
@@ -73,7 +73,7 @@ Resources:
       DatabaseName: !Ref rGlueDatabase
       Description: Crawls data to establish table in the raw zone - general analytics.
       Name: !Sub '${pProjectName}-datalake-crawler-rawzone'
-      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      Role: !GetAtt rGlueServiceRole.Arn
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
@@ -91,7 +91,7 @@ Resources:
       DatabaseName: !Ref rGlueDatabase
       Description: Crawls data to establish table in the curated zone for a data mart.
       Name: !Sub '${pProjectName}-datalake-crawler-curatedzone'
-      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      Role: !GetAtt rGlueServiceRole.Arn
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
@@ -100,3 +100,6 @@ Resources:
         S3Targets:
           - Path: !Sub 's3://${pCuratedZoneBucket}/'
 #TODO: add tags and other metadata to the tables. Can you do this here, or after the table is creqated?
+Outputs:
+  oGlueServiceRoleArn:
+    Value: !GetAtt rGlueServiceRole.Arn
