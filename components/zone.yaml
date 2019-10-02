@@ -4,12 +4,6 @@ Parameters:
   pDeadLetterQueueArn:
     Type: String
     Description: the ARN of the dead letter queue
-  pKeyAdministrator:
-    Type: String
-    Description: ARN of key administrator role.
-  pKeyUser:
-    Type: String
-    Description: ARN of key user role.
   pProjectName:
     Type: String
     Description: The lowercase, overall name of the project which will be used for naming and for tagging.
@@ -40,25 +34,13 @@ Parameters:
       - refined
       - curated
 Resources:
-  rCMK:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        pProjectName: !Ref pProjectName
-        pKeyAdministrator: !Ref pKeyAdministrator
-        pKeyUser: !Ref pKeyUser
-        pKeyDescription: !Sub 'Key for encrypting the ${pZone} Zone bucket and its sqs Queue'
-        pKeyAlias: !Sub 'alias/${pProjectName}-${pZone}-zone-cmk'
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/cmk.yaml
-      TimeoutInMinutes: 5
   rS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
-              SSEAlgorithm: aws:kms
-              KMSMasterKeyID: !GetAtt rCMK.Outputs.rKeyId
+              SSEAlgorithm: AES256
       BucketName: !Sub '${pProjectName}-${pZone}-${AWS::AccountId}'
       LifecycleConfiguration:
         Rules:

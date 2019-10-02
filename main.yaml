@@ -4,6 +4,9 @@ Parameters:
   pProjectName:
     Type: String
     Description: overall project name which will be used for tags and resource naming.
+  pS3TemplateLocation:
+    Type: String
+    Description: S3 location for the datalake files. Example: 'https://datalake-rww.s3.amazonaws.com'
 Resources:
   #IAM to produce the roles.
   rIam:
@@ -11,7 +14,7 @@ Resources:
     Properties:
       Parameters:
         pProjectName: !Ref pProjectName
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/iam.yaml
+      TemplateURL: !Sub '{$pS3TemplateLocation}/components/iam.yaml'
       TimeoutInMinutes: 5
 
   rDropZone:
@@ -21,14 +24,12 @@ Resources:
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
         pTransitionInDays: 7
         pZone: drop
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
+      TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
       TimeoutInMinutes: 15
 
   rRawZone:
@@ -38,14 +39,12 @@ Resources:
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
         pTransitionInDays: 7
         pZone: raw
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
+      TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
       TimeoutInMinutes: 15
 
   rCuratedZone:
@@ -55,14 +54,12 @@ Resources:
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
-        pKeyAdministrator: arn:aws:iam::773548596459:user/robwhelan
-        pKeyUser: arn:aws:iam::773548596459:role/lambda_basic_execution
         pProjectName: !Ref pProjectName
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
         pTransitionInDays: 7
         pZone: curated
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/zone.yaml
+      TemplateURL: !Sub '{$pS3TemplateLocation}/components/zone.yaml
       TimeoutInMinutes: 15
 
   #main database for data catalog.
@@ -78,7 +75,7 @@ Resources:
         pDropZoneBucket: !GetAtt rDropZone.Outputs.oS3Bucket
         pRawZoneBucket: !GetAtt rRawZone.Outputs.oS3Bucket
         pCuratedZoneBucket: !GetAtt rCuratedZone.Outputs.oS3Bucket
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/etl.yaml
+      TemplateURL: !Sub '{$pS3TemplateLocation}/components/etl.yaml
       TimeoutInMinutes: 5
 
   #cloudtrail logging
@@ -88,7 +85,7 @@ Resources:
   #  Properties:
   #    Parameters:
   #      pLoggingBucket: !Ref rLoggingBucket
-  #    TemplateURL: https://datalake-rww.s3.amazonaws.com/monitoring/cloudtrail.yaml
+  #    TemplateURL: !Sub '{$pS3TemplateLocation}/monitoring/cloudtrail.yaml
   #    TimeoutInMinutes: 5
 
   #Monitoring
@@ -99,7 +96,7 @@ Resources:
       Parameters:
         pProjectName: !Ref pProjectName
         pQueueName: !Sub '${pProjectName}-dead-letter-queue'
-      TemplateURL: https://datalake-rww.s3.amazonaws.com/components/queue-dead-letter.yaml
+      TemplateURL: !Sub '{$pS3TemplateLocation}/components/queue-dead-letter.yaml
       TimeoutInMinutes: 5
 
   #central logging bucket for any logging event - s3 access logging, cloudtrail.
