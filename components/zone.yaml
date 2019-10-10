@@ -48,6 +48,12 @@ Resources:
             Transitions:
               - StorageClass: !Ref pTransitionClass
                 TransitionInDays: !Ref pTransitionInDays
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+
       #LoggingConfiguration:
       #  DestinationBucketName: !Ref pLoggingBucket
       #  LogFilePrefix: !Sub 's3-access-logs/${pZone}/'

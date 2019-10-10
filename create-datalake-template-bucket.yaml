@@ -8,7 +8,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub 'security-datalake-template-bucket-${AWS::AccountId}'
+      BucketName: !Sub 'security-datalake-template-${AWS::AccountId}'
       LifecycleConfiguration:
         Rules:
           - Status: Enabled
