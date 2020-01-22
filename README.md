@@ -1,19 +1,12 @@
-![architecture](https://github.com/robwhelan/datalake/blob/master/Cloudreach%20Datalake%20Accelerator.png)
+![architecture](https://github.com/robwhelan/datalake/blob/master/2ndWatch%20DataOps%20Platform.png)
 
-TODO:
-write the glue trigger to tell the curation job to kick off when 4 glue jobs are done. (or 3, everything but the seller id table)
-make sure the crawler for the curated zone is looking at the correct path.
-refactor out the glue databases -- in etl.yaml, make one database for each zone. Rename the reference in crawlers to ponit to the specific zone.
-In the glue jobs, double check the databases are correctly named (different databases now, one for each zone)
-TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
-
-How:
-1. Set your AWS profile.
+##1. Set your AWS profile.
 ```bash
 export AWS_PROFILE=...
 ```
 
-2. First, run the main datalake creation script. This will download the template files, make a bucket to place them in AWS, and then generate a 3 zone datalake, a glue database for each zone, and crawlers.
+##2. Run the main datalake creation script.
+This will download the template files, make a bucket to place them in AWS, and then generate a 3 zone datalake, a glue database for each zone, and crawlers.
 
 From the root directory:
 ```bash
@@ -29,19 +22,12 @@ to update:
 $ bash update-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/main.yaml
 ```
 
+##3. Upload some data to the drop zone.
+For a demo, this upload is ~50MB and the source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
 
-2. Upload some data to the drop zone. This upload is ~50MB and should take about a minute or two.
-The source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
-```bash
-$ bash upload-data.sh <path-to-source-data> <your-drop-zone-bucket...output from the main.yaml stack>
-```
+##4. Run the first crawler (drop zone crawler).
+It will create metadata tables (one for each partition) for the drop zone.
 
-Example:
-```bash
-$ bash upload-data.sh ../ecommerce-data/ toyota-demo-drop-773548596459
-```
-
-3. Run the first crawler (drop zone crawler). It will create metadata tables (one for each partition) for the drop zone.
 ```bash
 $ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzone
 ```
@@ -142,6 +128,11 @@ TODO
 * Auditing
 * Monitoring
   * set up Macie outside of cloudformation. Might be a lambda or something that runs every week.
+  write a glue trigger to tell the curation job to kick off when 4 glue jobs are done. (or 3, everything but the seller id table)
+  make sure the crawler for the curated zone is looking at the correct path.
+  refactor out the glue databases -- in etl.yaml, make one database for each zone. Rename the reference in crawlers to ponit to the specific zone.
+  In the glue jobs, double check the databases are correctly named (different databases now, one for each zone)
+  TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
 
 ROLES
 
