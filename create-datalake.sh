@@ -7,6 +7,7 @@
 export BUCKET_STACK_NAME=make-datalake-template-bucket
 export DATALAKE_STACK_NAME=make-datalake-0
 
+echo 'creating a bucket to hold the template'
 aws cloudformation create-stack \
   --stack-name $BUCKET_STACK_NAME \
   --template-body file://datalake-template-bucket.yaml
@@ -23,12 +24,21 @@ export S3_BUCKET_NAME=$(aws cloudformation describe-stacks \
 echo $S3_BUCKET_NAME
 
 export S3_LOCATION='s3://'$S3_BUCKET_NAME;
-export MAIN_TEMPLATE_LOCATION=$S3_LOCATION'/main.yaml';
+export S3_TEMPLATE_LOCATION='https://'$S3_BUCKET_NAME'.s3.amazonaws.com';
 #upload everything to the new bucket.
-aws s3 cp . $S3_LOCATION --recursive
+echo 'uploading datalake files to '$S3_LOCATION;
+aws s3 cp . $S3_LOCATION --recursive;
 
 #now create the datalake
-aws cloudformation create-stack --stack-name $DATALAKE_STACK_NAME \
-  --template-url $MAIN_TEMPLATE_LOCATION \
-  --parameters pProjectName=$1 \
-  --capabilities CAPABILITY_NAMED_IAM
+echo 'creating the datalake'
+export DATALAKE_STACK_RESPONSE=$(aws cloudformation create-stack \
+  --stack-name $DATALAKE_STACK_NAME \
+  --template-url $S3_TEMPLATE_LOCATION'/main.yaml' \
+  --parameters \
+      ParameterKey='pProjectName',ParameterValue=$1 \
+      ParameterKey='pS3TemplateLocation',ParameterValue=$S3_TEMPLATE_LOCATION \
+  --capabilities CAPABILITY_NAMED_IAM \
+  )
+
+echo 'datalake stack id:'
+echo $DATALAKE_STACK_RESPONSE
