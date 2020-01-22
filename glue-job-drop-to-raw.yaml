@@ -16,6 +16,9 @@ Parameters:
   pDownstreamBucket:
     Type: String
     Description: the bucket downstream of hte drop zone bucket.
+  pGlueJobRoleArn:
+    Type: String
+    Description: output from the main stack. A role that authorizes Glue to access S3.
   pScriptLocation:
     Type: String
     Description: the script location for the etl.
@@ -37,5 +40,5 @@ Resources:
         "--downstream_bucket": !Ref pDownstreamBucket
       Description: Convert incoming CSV to Parquet.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw-${pTableName}'
-      Role: arn:aws:iam::773548596459:role/AWSGlueAdmin
+      Role: !Ref pGlueJobRoleArn
 #TODO: create the trigger that makes drop zone job run hourly.

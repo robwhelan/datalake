@@ -25,14 +25,17 @@ $ bash update-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/ma
 ##3. Upload some data to the drop zone.
 For a demo, this upload is ~50MB and the source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
 
-##4. Run the first crawler (drop zone crawler).
-It will create metadata tables (one for each partition) for the drop zone.
+##4. Run the first crawler (drop zone crawler) in order to establish a table for your drop zone.
+It will create metadata tables (one for each partition -- for each file you have) for the drop zone.
 
 ```bash
-$ aws glue start-crawler --name robs-kewl-datalake-test-datalake-crawler-dropzone
+$ aws glue start-crawler --name 2ndwatch-datalake-demo-datalake-crawler-dropzone
 ```
 
-4. Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone. For each Table in this Database, update the parameters 'table name' and 'partition', then run the stack -- be sure to name the stack something different each time.
+##5. Write a job to transform the dropped data into something you can analyze.
+TODO: make a dev endpoint, followed by a notebook, with userdata that immediately connects it to a codecommit repo.
+
+Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone. For each Table in this Database, update the parameters 'table name' and 'partition', then run the stack -- be sure to name the stack something different each time.
 ```bash
 $ aws cloudformation create-stack --stack-name glue-job-drop-to-raw-closed-deals-2 \
   --template-url https://datalake-rww.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
@@ -71,30 +74,20 @@ b. copy data from s3 into redshift table.
 c. Do some queries -- aggregate # of deals and sum of deal value per seller; average review per seller / per SDR.
 
 Design Principles
-1. Send only two stacks: 1 for your prod account, 1 for your security account.
+1.
 2. Allow for remote updates of the stacks as the architecture evolves.
 3. Few (3-5), simple, easily-understood roles instead of many roles.
-4. One database, many tables, all populated by Glue crawlers
+4. One database per zone
+5. many tables, all populated by Glue crawlers
 5. Glue (PySpark) for ETL with simple transformations.
 6. ETL to be built out after data initially loaded.
-7. Private S3 and DDB endpoints from the private subnets (not from the public or data subnets). Any lambda should run inside the private subnets.
 
 Features
-* As many zones as you want. 4 zones by default.
-* Each zone:
-  1. Bucket
-  2. Dedicated customer-managed CMK to encrypt the bucket, event notifications to SQS
-  3. Lambda stub to consume the queue
-* ETL:
-  Create one Glue database.
-  Then, create a Crawler and specify the location for the initial data. This will create a table prefixed with the prefix you specify ()
-  (Run the crawler via SQS / lambda after the resource is created? )
-  After the table is created, update the stack with a transformation?
-* Network: launched in us-east-1. Update the VPC stack otherwise (DHCP option sets)
+* As many zones as you want. 3 zones by default.
 
 * Dead letter queue to receive failed messages from every zone, and every lambda consuming the queue.
 
-* Lambda features:
+TODO: * Lambda features:
   1. Python3.6
   2. Uses 2 layers - one for numpy, the other for pandas.
   3. An all-in-one serverless data science / data engineering lambda.
@@ -104,19 +97,6 @@ Features
 Cloudtrail is created as a multi region trail.
 
 
-* architecture
-Zone:
-1. bucket
-2. CMK
-3. SQS queue for new object puts
-4. Lambda to consume the queue.
-
-ETL:
-1. Glue database - built at the beginning.
-2. Glue crawler - also built at the beginning.
-3. Later, TODO run the crawler after first data stored.
-4. Build a Job from cloudformation, that runs on new data.
-
 # datalake
 Notes
 * Works for one partition in each bucket. If your drop zone will spread to multiple data streams, such as images in one, and clickstream in another, add another SQS queue for notifications, and configure prefixes for each notifications (/images/ and /clickstream/). Then build a completely different lambda to work off the new queue. Modify the lambda to create a key that matches the partition.
@@ -124,15 +104,16 @@ Notes
 TODO
 * Roles
 * Other storage - RDS, Redshift, Elasticsearch
-* Security account & VPC
+* VPC (especially needed to launch redshift cluster)
 * Auditing
 * Monitoring
-  * set up Macie outside of cloudformation. Might be a lambda or something that runs every week.
-  write a glue trigger to tell the curation job to kick off when 4 glue jobs are done. (or 3, everything but the seller id table)
+
   make sure the crawler for the curated zone is looking at the correct path.
-  refactor out the glue databases -- in etl.yaml, make one database for each zone. Rename the reference in crawlers to ponit to the specific zone.
   In the glue jobs, double check the databases are correctly named (different databases now, one for each zone)
   TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
+
+  2ndwatch-datalake-demo-datalake-crawler-dropzone2ndwatch-datalake-demo-datalake-crawler-dropzone
+
 
 ROLES
 

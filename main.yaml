@@ -90,6 +90,12 @@ Resources:
       TemplateURL: !Sub '${pS3TemplateLocation}/components/queue-dead-letter.yaml'
       TimeoutInMinutes: 5
 
+  rCodeCommitRepo:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryDescription: !Sub 'A secure code repository for all the ETL within the ${pProjectName} project.'
+      RepositoryName: !Sub '${pProjectName}-etl-repo'
+
   #central logging bucket for any logging event - s3 access logging, cloudtrail.
   #TODO: this must be in a different account later.
   #config rules
@@ -99,3 +105,5 @@ Resources:
 Outputs:
   oDropZoneBucket:
     Value: !GetAtt rDropZone.Outputs.oS3Bucket
+  oETLRepoCloneUrl:
+    Value: !GetAtt rCodeCommitRepo.CloneUrlHttp
