@@ -1,11 +1,11 @@
 ![architecture](https://github.com/robwhelan/datalake/blob/master/2ndWatch%20DataOps%20Platform.png)
 
-##1. Set your AWS profile.
+## 1. Set your AWS profile.
 ```bash
 export AWS_PROFILE=...
 ```
 
-##2. Run the main datalake creation script.
+## 2. Run the main datalake creation script.
 This will download the template files, make a bucket to place them in AWS, and then generate a 3 zone datalake, a glue database for each zone, and crawlers.
 
 From the root directory:
@@ -22,17 +22,17 @@ to update:
 $ bash update-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/main.yaml
 ```
 
-##3. Upload some data to the drop zone.
+## 3. Upload some data to the drop zone.
 For a demo, this upload is ~50MB and the source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
 
-##4. Run the first crawler (drop zone crawler) in order to establish a table for your drop zone.
+## 4. Run the first crawler (drop zone crawler) in order to establish a table for your drop zone.
 It will create metadata tables (one for each partition -- for each file you have) for the drop zone.
 
 ```bash
 $ aws glue start-crawler --name 2ndwatch-datalake-demo-datalake-crawler-dropzone
 ```
 
-##5. Write a job to transform the dropped data into something you can analyze.
+## 5. Write a job to transform the dropped data into something you can analyze.
 TODO: make a dev endpoint, followed by a notebook, with userdata that immediately connects it to a codecommit repo.
 
 Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone. For each Table in this Database, update the parameters 'table name' and 'partition', then run the stack -- be sure to name the stack something different each time.
