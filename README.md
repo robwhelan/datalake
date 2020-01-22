@@ -8,18 +8,21 @@ In the glue jobs, double check the databases are correctly named (different data
 TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
 
 How:
-1. First, run the main.yaml script. This will generate, among other things, a glue database, all your s3 buckets, and crawlers.
-
-from the root directory:
+1. Set your AWS profile.
 ```bash
-$ bash create-datalake.sh <name-of-your-stack> <https path to main.yaml>
+export AWS_PROFILE=...
 ```
-Be sure to edit the file `main-template-parameters.json`.
-TODO: change this to accept parameters to the command, instead of editing the parameters file.
+
+2. First, run the main datalake creation script. This will download the template files, make a bucket to place them in AWS, and then generate a 3 zone datalake, a glue database for each zone, and crawlers.
+
+From the root directory:
+```bash
+$ bash create-datalake.sh <name-of-your-project>
+```
 
 Example:
 ```bash
-$ bash create-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/main.yaml
+$ bash create-datalake.sh toyota-demo-1
 ```
 to update:
 ```bash
