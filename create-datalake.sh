@@ -1,5 +1,5 @@
 #!/bin/bash
-aws cloudformation create-stack --stack-name $1 \
-  --template-url $2 \
-  --parameters file://main-template-parameters.json \
+aws cloudformation create-stack --stack-name $2 \
+  --template-url $3 \
+  --parameters pProjectName=$1 \
   --capabilities CAPABILITY_NAMED_IAM

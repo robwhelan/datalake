@@ -30,7 +30,6 @@ create table seller_performance(
 diststyle even
 compound sortkey(seller_id,sr_id);
 
-
 COPY seller_performance
 FROM 's3://datalake-demo-curated-773548596459/seller-performance/'
 IAM_ROLE 'arn:aws:iam::773548596459:role/redshiftlabs3'
