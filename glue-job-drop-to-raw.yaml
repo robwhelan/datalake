@@ -41,4 +41,4 @@ Resources:
       Description: Convert incoming CSV to Parquet.
       Name: !Sub '${pProjectName}-glue-job-drop-to-raw-${pTableName}'
       Role: !Ref pGlueJobRoleArn
-#TODO: create the trigger that makes drop zone job run hourly.
+#TODO: create a trigger says when to run this job. By default, it should run daily.

@@ -90,7 +90,10 @@ Resources:
       TablePrefix: !Sub '${pProjectName}_drop_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pDropZoneBucket}/'
+          - Path: !Sub 's3://${pDropZoneBucket}/order_items/'
+          - Path: !Sub 's3://${pDropZoneBucket}/order_reviews/'
+          - Path: !Sub 's3://${pDropZoneBucket}/orders/'
+          - Path: !Sub 's3://${pDropZoneBucket}/sellers/'
   rGlueCrawlerRawZone:
     Type: AWS::Glue::Crawler
     Properties:

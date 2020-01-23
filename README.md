@@ -25,21 +25,53 @@ $ bash update-datalake.sh toyota-demo-1 https://datalake-rww.s3.amazonaws.com/ma
 ## 3. Upload some data to the drop zone.
 For a demo, this upload is ~50MB and the source data can be found on Kaggle: https://www.kaggle.com/olistbr/brazilian-ecommerce
 
-## 4. Run the first crawler (drop zone crawler) in order to establish a table for your drop zone.
-It will create metadata tables (one for each partition -- for each file you have) for the drop zone.
+## 4. Edit the drop zone crawler to match the partitions of the data sources you want.
+```yaml
+#/components/etl.yaml
+rGlueCrawlerDropZone:
+  Type: AWS::Glue::Crawler
+  Properties:
+    DatabaseName: !Ref rGlueDatabaseDrop
+    ...
+    Targets:
+      S3Targets:
+        - Path: !Sub 's3://${pDropZoneBucket}/order_items/'
+        - Path: !Sub 's3://${pDropZoneBucket}/order_reviews/'
+        - Path: !Sub 's3://${pDropZoneBucket}/orders/'
+        - Path: !Sub 's3://${pDropZoneBucket}/sellers/'
+```
+Then upload the files to the S3 bucket, and update the stack.
 
 ```bash
-$ aws glue start-crawler --name 2ndwatch-datalake-demo-datalake-crawler-dropzone
+aws s3 cp . s3://2ndwatch-datalake-template-for-486567699039 --recursive
+
+bash update-datalake.sh make-datalake-0 https://2ndwatch-datalake-template-for-486567699039.s3.amazonaws.com/main.yaml
 ```
 
-## 5. Write a job to transform the dropped data into something you can analyze.
-TODO: make a dev endpoint, followed by a notebook, with userdata that immediately connects it to a codecommit repo.
+## 5. Run the drop zone first crawler to establish tables for your drop zone.
 
-Run glue-job-drop-to-raw.yaml CloudFormation to create the glue job that will reformat data from the raw zone. For each Table in this Database, update the parameters 'table name' and 'partition', then run the stack -- be sure to name the stack something different each time.
+It will create metadata tables (one for each partition that you created the step before) for the drop zone.
+
 ```bash
-$ aws cloudformation create-stack --stack-name glue-job-drop-to-raw-closed-deals-2 \
+aws glue start-crawler --name 2ndwatch-datalake-demo-datalake-crawler-dropzone
+```
+The crawler should generate four tables. Check the schema of the tables to ensure everything was captured correctly.
+
+## 6. Write a job to transform the dropped data into something you can analyze.
+(TODO: make a dev endpoint, followed by a notebook, with userdata that immediately connects it to a codecommit repo)
+
+At this point, your data in the drop zone needs to be modified into a format that is optimized for analytics - we use parquet. Run glue-job-drop-to-raw.yaml to create the glue job that will reformat data from the raw zone. *For each Table in this Database*, update the parameters 'table name' and 'partition' in `glue-job-drop-to-raw-parameters.json`, then run the stack -- be sure to name the stack something different each time.
+```bash
+$ aws cloudformation create-stack --stack-name glue-job-drop-to-raw-order_items \
   --template-url https://datalake-rww.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
-  --parameters file://glue-job-drop-to-raw-parameters.json
+  --parameters \
+    ParameterKey=pProjectName,ParameterValue=2ndwatch-datalake-demo \
+    ParameterKey=pDatabaseName,ParameterValue=2ndwatch-datalake-demo-datalake-drop-zone-database \
+    ParameterKey=pTableName,ParameterValue=2ndwatch-datalake-demo_drop_order_items \
+    ParameterKey=pDataPartition,ParameterValue=order_items \
+    ParameterKey=pDownstreamBucket,ParameterValue=2ndwatch-datalake-demo-raw-486567699039 \
+    ParameterKey=pScriptLocation,ParameterValue=s3://2ndwatch-datalake-template-for-486567699039/demo/glue-scripts/drop-to-raw-order-items.py \
+
 ```
 TODO: automate this to create a new job for each partition -- each table that came out of the drop zone. Because each data set will have different treatment. OR, you'd have to manually modify the glue job to just do every partition while it is up... write a loop inside the partition.
 
