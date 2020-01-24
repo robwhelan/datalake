@@ -95,18 +95,17 @@ $ aws glue start-crawler --name datalake-demo-datalake-crawler-rawzone
 ```
 
 ## 8. Explore your analytics-ready data in Athena.
-Use as examples, the scripts in `/demo/athena-scripts/`. To review scores by seller:
+Use as examples, the scripts in `/demo/athena-scripts/`. To see reviews by product id:
 ```sql
-SELECT order_reviews.order_id, closed_deals.seller_id, review_score, sdr_id, sr_id
-    FROM "2ndwatch-datalake-demo-datalake-raw-zone-database"."2ndwatch-datalake-demo_raw_order_reviews" order_reviews
-    join "2ndwatch-datalake-demo-datalake-raw-zone-database"."2ndwatch-datalake-demo_raw_order_items" order_items
+SELECT product_id, review_score, review_comment_title, review_comment_message
+    FROM "2ndwatch-datalake-demo-datalake-raw-zone-database"."2ndwatch-datalake-demo_analytics_order_reviews" order_reviews
+    join "2ndwatch-datalake-demo-datalake-raw-zone-database"."2ndwatch-datalake-demo_analytics_order_items" order_items
     on (order_reviews.order_id = order_items.order_id)
-    join "2ndwatch-datalake-demo-datalake-raw-zone-database"."2ndwatch-datalake-demo_raw_orders" orders
-    on (order_items.seller_id = orders.seller_id)
-limit 100;
+limit 1000;
 ```
 
-8. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
+## 9. Run glue-job-raw-to-curated.yaml.
+This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
 ```bash
 $ aws cloudformation create-stack --stack-name glue-job-raw-to-curated \
   --template-url https://datalake-rww.s3.amazonaws.com/glue-job-raw-to-curated.yaml \
@@ -115,13 +114,15 @@ $ aws cloudformation create-stack --stack-name glue-job-raw-to-curated \
 
 9. Run the glue job. This will move the new dataset into the curated zone.
 
-10. Turn on a redshift cluster
-Make sure the security group is there.
+## 10. Turn on a redshift cluster
 
-11. Query editor:
+Query editor:
 a. create table that matches the schema from S3 curated zone.
 b. copy data from s3 into redshift table.
 c. Do some queries -- aggregate # of deals and sum of deal value per seller; average review per seller / per SDR.
+
+## 11. Turn on quicksight
+
 
 Design Principles
 1.

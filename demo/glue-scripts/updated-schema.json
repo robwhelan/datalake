@@ -1,0 +1,93 @@
+{
+  "Name": "2ndwatch-datalake-demo_drop_orders",
+  "StorageDescriptor": {
+    "Columns": {
+      "FieldSchema": [
+        {
+          "Name": "order_id",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "customer_id",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "order_status",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "order_purchase_timestamp",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "order_approved_at",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "order_delivered_carrier_date",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "order_delivered_customer_date",
+          "Type": "string",
+          "Comment": ""
+        },
+        {
+          "Name": "order_estimated_delivery_date",
+          "Type": "string",
+          "Comment": ""
+        }
+      ]
+    },
+    "Location": "s3://2ndwatch-datalake-demo-drop-486567699039/orders/",
+    "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+    "OutputFormat": "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
+    "Compressed": false,
+    "SerdeInfo": {
+      "SerializationLibrary": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+      "Parameters": {
+        "field.delim": ","
+      }
+    },
+    "BucketColumns": [],
+    "SortColumns": [],
+    "Parameters": {
+      "sizeKey": "17406884",
+      "objectCount": "1",
+      "UPDATED_BY_CRAWLER": "2ndwatch-datalake-demo-datalake-crawler-dropzone",
+      "CrawlerSchemaSerializerVersion": "1.0",
+      "recordCount": "101794",
+      "averageRecordSize": "171",
+      "CrawlerSchemaDeserializerVersion": "1.0",
+      "compressionType": "none",
+      "classification": "csv",
+      "columnsOrdered": "true",
+      "AreColumnsQuoted": "false",
+      "delimiter": ",",
+      "TypeOfData": "file"
+    },
+    "SkewedInfo": {},
+    "StoredAsSubDirectories": false
+  },
+  "Parameters": {
+    "SizeKey": "17406884",
+    "ObjectCount": "1",
+    "UPDATED_BY_CRAWLER": "2ndwatch-datalake-demo-datalake-crawler-dropzone",
+    "CrawlerSchemaSerializerVersion": "1.0",
+    "RecordCount": "101794",
+    "AverageRecordSize": "171",
+    "CrawlerSchemaDeserializerVersion": "1.0",
+    "CompressionType": "none",
+    "Classification": "csv",
+    "ColumnsOrdered": "true",
+    "AreColumnsQuoted": "false",
+    "Delimiter": ",",
+    "TypeOfData": "file"
+  }
+}

@@ -32,7 +32,7 @@ datasource0 = glueContext.create_dynamic_frame.from_catalog(database = args['dat
 ## @args: [mapping = [("order_id", "string", "order_id", "string"), ("order_item_id", "long", "order_item_id", "long"), ("product_id", "string", "product_id", "string"), ("seller_id", "string", "seller_id", "string"), ("shipping_limit_date", "string", "shipping_limit_date", "string"), ("price", "double", "price", "double"), ("freight_value", "double", "freight_value", "double")], transformation_ctx = "applymapping1"]
 ## @return: applymapping1
 ## @inputs: [frame = datasource0]
-applymapping1 = ApplyMapping.apply(frame = datasource0, mappings = [("mql_id", "string", "mql_id", "string"), ("seller_id", "string", "seller_id", "string"), ("sdr_id", "string", "sdr_id", "string"), ("sr_id", "string", "sr_id", "string"), ("won_date", "string", "won_date", "string"), ("business_segment", "string", "business_segment", "string"), ("lead_type", "string", "lead_type", "string"), ("lead_behaviour_profile", "string", "lead_behaviour_profile", "string"), ("has_company", "boolean", "has_company", "boolean"), ("has_gtin", "boolean", "has_gtin", "boolean"), ("average_stock", "string", "average_stock", "string"), ("business_type", "string", "business_type", "string"), ("declared_product_catalog_size", "double", "declared_product_catalog_size", "double"), ("declared_monthly_revenue", "double", "declared_monthly_revenue", "double")], transformation_ctx = "applymapping1")
+applymapping1 = ApplyMapping.apply(frame = datasource0, mappings = [("order_id", "string", "order_id", "string"), ("order_item_id", "string", "order_item_id", "long"), ("product_id", "string", "product_id", "string"), ("seller_id", "string", "seller_id", "string"), ("shipping_limit_date", "string", "shipping_limit_date", "string"), ("price", "string", "price", "double"), ("freight_value", "string", "freight_value", "double")], transformation_ctx = "applymapping1")
 ## @type: ResolveChoice
 ## @args: [choice = "make_struct", transformation_ctx = "resolvechoice2"]
 ## @return: resolvechoice2
@@ -44,7 +44,6 @@ resolvechoice2 = ResolveChoice.apply(frame = applymapping1, choice = "make_struc
 ## @inputs: [frame = resolvechoice2]
 dropnullfields3 = DropNullFields.apply(frame = resolvechoice2, transformation_ctx = "dropnullfields3")
 ## @type: DataSink
-## @args: [connection_type = "s3", connection_options = {"path": "s3://robs-kewl-datalake-test-raw-773548596459/junk/"}, format = "parquet", transformation_ctx = "datasink4"]
 ## @return: datasink4
 ## @inputs: [frame = dropnullfields3]
 datasink4 = glueContext.write_dynamic_frame.from_options(frame = dropnullfields3, connection_type = "s3", connection_options = {"path": downstreamBucket}, format = "parquet", transformation_ctx = "datasink4")
