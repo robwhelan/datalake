@@ -90,7 +90,7 @@ Resources:
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: !Sub '${pProjectName}_drop_' #generalize this
+      TablePrefix: 'drop_' #generalize this
       Targets:
         S3Targets:
           - Path: !Sub 's3://${pDropZoneBucket}/order_items/'
@@ -107,11 +107,13 @@ Resources:
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: !Sub '${pProjectName}_raw_' #generalize this
+      TablePrefix: 'analytics_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pRawZoneBucket}/'
-          #TODO: get rid of hard-coding of s3 targets.
+          - Path: !Sub 's3://${pRawZoneBucket}/order_items/'
+          - Path: !Sub 's3://${pRawZoneBucket}/order_reviews/'
+          - Path: !Sub 's3://${pRawZoneBucket}/orders/'
+          - Path: !Sub 's3://${pRawZoneBucket}/sellers/'
   rGlueCrawlerCuratedZone:
     Type: AWS::Glue::Crawler
     Properties:
@@ -122,7 +124,7 @@ Resources:
       SchemaChangePolicy:
         DeleteBehavior: DEPRECATE_IN_DATABASE
         UpdateBehavior: UPDATE_IN_DATABASE
-      TablePrefix: !Sub '${pProjectName}_curated_' #generalize this
+      TablePrefix: '_curated_' #generalize this
       Targets:
         S3Targets:
           - Path: !Sub 's3://${pCuratedZoneBucket}/'
