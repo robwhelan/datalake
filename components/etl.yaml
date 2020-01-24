@@ -9,6 +9,8 @@ Parameters:
     Type: String
   pCuratedZoneBucket:
     Type: String
+  pTemplateBucket:
+    Type: String
 Resources:
   #glue service role. Reference the glue managed policy.
   #then, create a custom policy that allows glue to read and write to the s3 buckets.
@@ -49,6 +51,7 @@ Resources:
               - !Sub 'arn:aws:s3:::${pDropZoneBucket}/*'
               - !Sub 'arn:aws:s3:::${pRawZoneBucket}/*'
               - !Sub 'arn:aws:s3:::${pCuratedZoneBucket}/*'
+              - !Sub 'arn:aws:s3:::${pTemplateBucket}/*'
       PolicyName: glueServiceRole-read-write-s3
       Roles:
         - !Ref rGlueServiceRole

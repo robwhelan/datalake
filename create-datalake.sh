@@ -37,6 +37,7 @@ export DATALAKE_STACK_RESPONSE=$(aws cloudformation create-stack \
   --parameters \
       ParameterKey='pProjectName',ParameterValue=$1 \
       ParameterKey='pS3TemplateLocation',ParameterValue=$S3_TEMPLATE_LOCATION \
+      ParameterKey='pTemplateBucket',ParameterValue=$S3_BUCKET_NAME \
   --capabilities CAPABILITY_NAMED_IAM \
   )
 

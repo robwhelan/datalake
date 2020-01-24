@@ -7,6 +7,9 @@ Parameters:
   pS3TemplateLocation:
     Type: String
     Description: S3 location for the datalake files Example https://datalake-rww.s3.amazonaws.com
+  pTemplateBucket:
+    Type: String
+    Description: S3 bucket name for datalake files.
 Resources:
   rDropZone:
     Type: AWS::CloudFormation::Stack
@@ -66,6 +69,7 @@ Resources:
         pDropZoneBucket: !GetAtt rDropZone.Outputs.oS3Bucket
         pRawZoneBucket: !GetAtt rRawZone.Outputs.oS3Bucket
         pCuratedZoneBucket: !GetAtt rCuratedZone.Outputs.oS3Bucket
+        pTemplateBucket: !Ref pTemplateBucket
       TemplateURL: !Sub '${pS3TemplateLocation}/components/etl.yaml'
       TimeoutInMinutes: 5
 

@@ -4,4 +4,5 @@ aws cloudformation update-stack --stack-name $1 \
   --parameters \
     ParameterKey=pS3TemplateLocation,UsePreviousValue=true \
     ParameterKey=pProjectName,UsePreviousValue=true \
+    ParameterKey=pTemplateBucket,UsePreviousValue=true \
   --capabilities CAPABILITY_NAMED_IAM

@@ -57,36 +57,54 @@ aws glue start-crawler --name 2ndwatch-datalake-demo-datalake-crawler-dropzone
 ```
 The crawler should generate four tables. Check the schema of the tables to ensure everything was captured correctly.
 
-## 6. Write a job to transform the dropped data into something you can analyze.
+## 6. Create jobs to transform the dropped data into something you can analyze.
 (TODO: make a dev endpoint, followed by a notebook, with userdata that immediately connects it to a codecommit repo)
 
 At this point, your data in the drop zone needs to be modified into a format that is optimized for analytics - we use parquet. Run glue-job-drop-to-raw.yaml to create the glue job that will reformat data from the raw zone. *For each Table in the Database*, update the parameters `--stack-name`, `pTableName`, `pDataPartition`, `pScriptLocation`, then run the stack.
 ```bash
-aws cloudformation create-stack --stack-name glue-job-drop-to-raw-order-items \
+aws cloudformation create-stack --stack-name glue-job-drop-to-raw-sellers \
   --template-url https://2ndwatch-datalake-template-for-486567699039.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
   --parameters \
     ParameterKey=pProjectName,ParameterValue=2ndwatch-datalake-demo \
     ParameterKey=pDatabaseName,ParameterValue=2ndwatch-datalake-demo-datalake-drop-zone-database \
-    ParameterKey=pTableName,ParameterValue=2ndwatch-datalake-demo_drop_order_items \
-    ParameterKey=pDataPartition,ParameterValue=order_items \
+    ParameterKey=pTableName,ParameterValue=2ndwatch-datalake-demo_drop_sellers \
+    ParameterKey=pDataPartition,ParameterValue=sellers \
     ParameterKey=pDownstreamBucket,ParameterValue=2ndwatch-datalake-demo-raw-486567699039 \
-    ParameterKey=pScriptLocation,ParameterValue=s3://2ndwatch-datalake-template-for-486567699039/demo/glue-scripts/drop-to-raw-order-items.py \
+    ParameterKey=pScriptLocation,ParameterValue=s3://2ndwatch-datalake-template-for-486567699039/demo/glue-scripts/drop-to-raw-sellers.py \
     ParameterKey=pGlueJobRoleArn,ParameterValue=arn:aws:iam::486567699039:role/BaseGlueServiceRole
 ```
 TODO: automate this to create a new job for each partition -- each table that came out of the drop zone. Because each data set will have different treatment. OR, you'd have to manually modify the glue job to just do every partition while it is up... write a loop inside the partition.
 
-5. Run the glue job for each partition (table name). This will move data into the raw zone, and set up for an hourly schedule.
+### Run the jobs:
 ```bash
-$ bash run-raw-glue-jobs.sh
+for job in \
+  2ndwatch-datalake-demo-glue-job-drop-to-raw-2ndwatch-datalake-demo_drop_order_items \
+  2ndwatch-datalake-demo-glue-job-drop-to-raw-2ndwatch-datalake-demo_drop_order_reviews \
+  2ndwatch-datalake-demo-glue-job-drop-to-raw-2ndwatch-datalake-demo_drop_orders \
+  2ndwatch-datalake-demo-glue-job-drop-to-raw-2ndwatch-datalake-demo_drop_sellers;
+do
+  aws glue start-job-run --job-name $job
+done
 ```
+Wait for the jobs to finish.
 
-TODO:::::
-6. Wait until the first transform jobs are done. Run the second crawler -- the one for the raw zone. This will create metadata tables for the raw zone. This is defined in etl.yaml.
+## 7. Run the Analytics zone crawler
+Run the second crawler -- the one for the Analytics zone to create metadata tables.
 ```bash
 $ aws glue start-crawler --name datalake-demo-datalake-crawler-rawzone
 ```
 
-7. Explore your analytics-ready data in Athena.
+## 8. Explore your analytics-ready data in Athena.
+Use as examples, the scripts in `/demo/athena-scripts/`. To review scores by seller:
+```sql
+SELECT order_reviews.order_id, closed_deals.seller_id, review_score, sdr_id, sr_id
+    FROM "...-database"."..._order_reviews" order_reviews
+    join "...-database"."..._order_items" order_items
+    on (order_reviews.order_id = order_items.order_id)
+    join "...-database"."..._closed_deals" closed_deals
+    on (order_items.seller_id = closed_deals.seller_id)
+limit 100;
+```
 
 8. Run glue-job-raw-to-curated.yaml. This will create a glue job responsible for reformatting / joining the data. And, it will create a trigger for the job, to make it run anytime the first job succeeds.
 ```bash
@@ -117,34 +135,21 @@ Design Principles
 Features
 * As many zones as you want. 3 zones by default.
 
-* Dead letter queue to receive failed messages from every zone, and every lambda consuming the queue.
+* Dead letter queue to receive failed messages from every zone
 
-TODO: * Lambda features:
-  1. Python3.6
-  2. Uses 2 layers - one for numpy, the other for pandas.
-  3. An all-in-one serverless data science / data engineering lambda.
-  4. The stub assumes a CSV was dropped into the zone bucket; it gets picked up, example transformation on it, and then re-saved as a new CSV in the next zone.
-
-* Monitoring:
-Cloudtrail is created as a multi region trail.
-
-
-# datalake
-Notes
-* Works for one partition in each bucket. If your drop zone will spread to multiple data streams, such as images in one, and clickstream in another, add another SQS queue for notifications, and configure prefixes for each notifications (/images/ and /clickstream/). Then build a completely different lambda to work off the new queue. Modify the lambda to create a key that matches the partition.
 
 TODO
-* Roles
+* Roles from LakeFormation
 * Other storage - RDS, Redshift, Elasticsearch
 * VPC (especially needed to launch redshift cluster)
 * Auditing
-* Monitoring
+* Monitoring Cloudtrail is created as a multi region trail.
+* Use Elasticsearch for a better, more searchable data catalog
+* Rename resources and variables: "raw zone" --> "analytics zone".
 
-  make sure the crawler for the curated zone is looking at the correct path.
-  In the glue jobs, double check the databases are correctly named (different databases now, one for each zone)
-  TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
-
-  2ndwatch-datalake-demo-datalake-crawler-dropzone2ndwatch-datalake-demo-datalake-crawler-dropzone
+make sure the crawler for the curated zone is looking at the correct path.
+In the glue jobs, double check the databases are correctly named (different databases now, one for each zone)
+TODO: cloudformation template for redshift cluster - 4 nodes, dc2.large, inside a VPC with the correct security group (create a security group with correct ports, to allow for quicksight to look at redshift)
 
 
 ROLES
