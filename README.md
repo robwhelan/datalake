@@ -60,10 +60,10 @@ The crawler should generate four tables. Check the schema of the tables to ensur
 ## 6. Write a job to transform the dropped data into something you can analyze.
 (TODO: make a dev endpoint, followed by a notebook, with userdata that immediately connects it to a codecommit repo)
 
-At this point, your data in the drop zone needs to be modified into a format that is optimized for analytics - we use parquet. Run glue-job-drop-to-raw.yaml to create the glue job that will reformat data from the raw zone. *For each Table in this Database*, update the parameters 'table name' and 'partition' in `glue-job-drop-to-raw-parameters.json`, then run the stack -- be sure to name the stack something different each time.
+At this point, your data in the drop zone needs to be modified into a format that is optimized for analytics - we use parquet. Run glue-job-drop-to-raw.yaml to create the glue job that will reformat data from the raw zone. *For each Table in the Database*, update the parameters `--stack-name`, `pTableName`, `pDataPartition`, `pScriptLocation`, then run the stack.
 ```bash
-$ aws cloudformation create-stack --stack-name glue-job-drop-to-raw-order_items \
-  --template-url https://datalake-rww.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
+aws cloudformation create-stack --stack-name glue-job-drop-to-raw-order-items \
+  --template-url https://2ndwatch-datalake-template-for-486567699039.s3.amazonaws.com/glue-job-drop-to-raw.yaml \
   --parameters \
     ParameterKey=pProjectName,ParameterValue=2ndwatch-datalake-demo \
     ParameterKey=pDatabaseName,ParameterValue=2ndwatch-datalake-demo-datalake-drop-zone-database \
@@ -71,7 +71,7 @@ $ aws cloudformation create-stack --stack-name glue-job-drop-to-raw-order_items 
     ParameterKey=pDataPartition,ParameterValue=order_items \
     ParameterKey=pDownstreamBucket,ParameterValue=2ndwatch-datalake-demo-raw-486567699039 \
     ParameterKey=pScriptLocation,ParameterValue=s3://2ndwatch-datalake-template-for-486567699039/demo/glue-scripts/drop-to-raw-order-items.py \
-
+    ParameterKey=pGlueJobRoleArn,ParameterValue=arn:aws:iam::486567699039:role/BaseGlueServiceRole
 ```
 TODO: automate this to create a new job for each partition -- each table that came out of the drop zone. Because each data set will have different treatment. OR, you'd have to manually modify the glue job to just do every partition while it is up... write a loop inside the partition.
 
