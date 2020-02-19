@@ -30,8 +30,7 @@ Parameters:
     Description: The processing zone of the Datalake.
     AllowedValues:
       - drop
-      - raw
-      - refined
+      - analytics
       - curated
 Resources:
   rS3Bucket:

@@ -37,7 +37,7 @@ Resources:
         pSqsQueueVisibilityTimeout: 120
         pTransitionClass: GLACIER
         pTransitionInDays: 7
-        pZone: raw
+        pZone: analytics
       TemplateURL: !Sub '${pS3TemplateLocation}/components/zone.yaml'
       TimeoutInMinutes: 15
 
