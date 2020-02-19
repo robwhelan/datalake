@@ -1,5 +1,8 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: builds a basic datalake with 3 zones and dedicated encryption keys.
+
+
 Parameters:
   pProjectName:
     Type: String
@@ -10,6 +13,22 @@ Parameters:
   pTemplateBucket:
     Type: String
     Description: S3 bucket name for datalake files.
+
+  pBuildRedshift:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Choose whether to build a Redshift Cluster or not
+
+
+Conditions:
+  cBuildRedshift: !Equals
+    - !Ref pBuildRedshift
+    - "true"
+
+
 Resources:
   rDropZone:
     Type: AWS::CloudFormation::Stack
@@ -105,6 +124,18 @@ Resources:
   #config rules
   #logging
   #other security, like macie
+
+
+  # TODO: Figure out a good timeout...redshift can take awhile
+  rRedshiftCluster:
+    Type: AWS::Cloudformation::Stack
+    Condition: cBuildRedshift
+    Properties:
+      TemplateURL: !Sub '${pS3TemplateLocation}/components/redshift.yaml'
+      TimeoutInMinutes: 120
+      Parameters:
+        pProjectName: !Ref pProjectName
+
 
 Outputs:
   oDropZoneBucket:

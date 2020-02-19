@@ -1,48 +1,120 @@
+# TODO
+# - Verify Tag Name hack works
+# - Outputs
+# - is parameter group necessary and if so, how to sanely configure or do we pass in
+# - snapshot config
+# - Maintenance window
+# - Logging properties
+# - Encrpytion (KMS, HSM, etc)
+# - Elastic IP Needed?
+---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Redshift infrastructure. Redshift 4-node cluster and .
+
+
 Parameters:
+  # General
   pProjectName:
     Type: String
-  pDropZoneBucket:
+
+  # Cluster
+  pClusterName:
     Type: String
-  pRawZoneBucket:
+  pDBName:
     Type: String
-  pCuratedZoneBucket:
+  pMasterUsername:
     Type: String
-  Resources:
+  pMasterUserPassword:
+    Type: String
+    NoEcho: True
+  pNodeType:
+    Type: String
+    AllowedValues:
+      - ds2.xlarge
+      - ds2.8xlarge
+      - dc1.large
+      - dc1.8xlarge
+      - dc2.large
+      - dc2.8xlarge
+      - ra3.16xlarge
+  pNumberOfNodes:
+    Type: Number
+    Default: 4
+  pPort:
+    Type: Number
+    Default: 5439
+  pIamRoleArns:
+    Type: List<String>
+
+  # Subnet
+  pSubnetIds:
+    Type: List<Number>
+
+  # Ingress
+  pClusterIngressCIDR:
+    Type: String
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+  pClusterIngressSG:
+    Type: String
+    Default: ""
+
+
+Conditions:
+  cBuildClusterIngressSG: !Not [!Equals [!Ref pClusterIngressSG, AWS::NoValue]]
+
+Resources:
+  rRedshiftCluster:
     Type: AWS::Redshift::Cluster
     Properties:
-      AllowVersionUpgrade: Boolean
-      AutomatedSnapshotRetentionPeriod: Integer
-      AvailabilityZone: String
-      ClusterIdentifier: String
-      ClusterParameterGroupName: String
-      ClusterSecurityGroups:
-        - String
-      ClusterSubnetGroupName: String
-      ClusterType: String
-      ClusterVersion: String
-      DBName: String
-      ElasticIp: String
-      Encrypted: Boolean
-      HsmClientCertificateIdentifier: String
-      HsmConfigurationIdentifier: String
-      IamRoles:
-        - String
-      KmsKeyId: String
-      LoggingProperties:
-        LoggingProperties
-      MasterUsername: String
-      MasterUserPassword: String
-      NodeType: String
-      NumberOfNodes: Integer
-      OwnerAccount: String
-      Port: Integer
-      PreferredMaintenanceWindow: String
-      PubliclyAccessible: Boolean
-      SnapshotClusterIdentifier: String
-      SnapshotIdentifier: String
+      ClusterIdentifier: !Ref pClusterName
+      ClusterType: multi-node
+      DBName: !Ref pDBName
+      MasterUsername: !Ref pMasterUsername
+      MasterUserPassword: !Ref pMasterUserPassword
+      NodeType: !Ref pNodeType
+      ClusterSecurityGroups: 
+        - !Ref rClusterSecurityGroup
+      ClusterSubnetGroupName: !Ref rClusterSubnetGroup
+      NumberOfNodes: !Ref pNumberOfNodes
+      IamRoles: !Ref pIamRoleArns
+      Port: !Ref pPort
       Tags:
-        - Tag
-      VpcSecurityGroupIds:
-        - String
+        - Key: ProjectName
+          Value: !Ref pProjectName
+  rClusterSubnetGroup:
+    Type: AWS::Redshift::ClusterSubnetGroup
+    Properties:
+      Description: !Sub 
+        - "A Subnet Group for ${cluster}"
+        - { cluster: !Ref pClusterName }
+      SubnetIds: !Ref pSubnetIds
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - "${cluster}-subnetgroup"
+            - { cluster: !Ref pClusterName }
+        - Key: ProjectName
+          Value: !Ref pProjectName
+  rClusterSecurityGroup:
+    Type: AWS::Redshift::ClusterSecurityGroup
+    Properties:
+      Description: !Sub 
+        - "A Security Group for ${cluster}"
+        - { cluster: !Ref pClusterName }
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - "${cluster}-securitygroup"
+            - { cluster: !Ref pClusterName }
+  rClusterIngressCIDR:
+    Type: AWS::Redshift::ClusterSecurityGroupIngress
+    Properties:
+      ClusterSecurityGroupName: !Ref rClusterSecurityGroup
+      CIDRIP: !Ref pClusterIngressCIDR
+  rClusterIngressSG:
+    Type: AWS::Redshift::ClusterSecurityGroupIngress
+    Condition: cBuildClusterIngressSG
+    Properties:
+      ClusterSecurityGroupName: !Ref rClusterSecurityGroup
+      EC2SecurityGroupName: !Ref pClusterIngressSG
+
