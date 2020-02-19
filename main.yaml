@@ -110,4 +110,4 @@ Outputs:
   oDropZoneBucket:
     Value: !GetAtt rDropZone.Outputs.oS3Bucket
   oETLRepoCloneUrl:
-    Value: !GetAtt rCodeCommitRepo.CloneUrlHttp
+    Value: !GetAtt rCodeCommitRepository.CloneUrlHttp

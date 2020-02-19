@@ -3,10 +3,12 @@
 #clone the datalake repo.
 #cd into the new repo folder.
 
-#make the s3 bucket to hold the templates
-export BUCKET_STACK_NAME=make-datalake-template-bucket
-export DATALAKE_STACK_NAME=make-datalake
-export BUCKET_TO_HOLD_TEMPLATE=dlau-datalake-template-bucket
+#to turn back the clock:
+#aws cloudformation delete-stack --stack-name make-datalake-template-stack
+
+export BUCKET_STACK_NAME=make-datalake-template-stack
+export DATALAKE_STACK_NAME=make-datalake-stack
+export BUCKET_TO_HOLD_TEMPLATE=dlau-datalake-template
 
 echo 'creating a bucket to hold the template'
 aws cloudformation create-stack \
@@ -19,8 +21,7 @@ aws cloudformation wait stack-create-complete --stack-name $BUCKET_STACK_NAME
 export S3_BUCKET_NAME=$(aws cloudformation describe-stacks \
   --stack-name $BUCKET_STACK_NAME \
   --output text \
-  --query Stacks[0].Outputs[0].OutputValue \
-  )
+  --query Stacks[0].Outputs[0].OutputValue )
 
 echo 'bucket to hold template is created:'
 echo $S3_BUCKET_NAME
