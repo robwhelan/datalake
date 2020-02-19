@@ -1,5 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: An encrypted bucket that will hold the datalake templates.
+Parameters:
+  rS3BucketName:
+    Type: String
 Resources:
   rS3Bucket:
     Type: AWS::S3::Bucket
@@ -8,7 +11,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub 'ians-datalake-template-for-${AWS::AccountId}'
+      BucketName: !Ref rS3BucketName
       LifecycleConfiguration:
         Rules:
           - Status: Enabled

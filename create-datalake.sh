@@ -4,25 +4,25 @@
 #cd into the new repo folder.
 
 #make the s3 bucket to hold the templates
-export BUCKET_STACK_NAME=make-datalake-template-bucket-3
-export DATALAKE_STACK_NAME=make-datalake-4
+export BUCKET_STACK_NAME=make-datalake-template-bucket
+export DATALAKE_STACK_NAME=make-datalake
+export BUCKET_TO_HOLD_TEMPLATE=dlau-datalake-template-bucket
 
-#echo 'creating a bucket to hold the template'
-#aws cloudformation create-stack \
-#  --stack-name $BUCKET_STACK_NAME \
-#  --template-body file://datalake-template-bucket.yaml
+echo 'creating a bucket to hold the template'
+aws cloudformation create-stack \
+  --stack-name $BUCKET_STACK_NAME \
+  --parameters ParameterKey=rS3BucketName,ParameterValue=$BUCKET_TO_HOLD_TEMPLATE \
+  --template-body file://datalake-template-bucket.yaml
 
-#aws cloudformation wait stack-create-complete --stack-name $BUCKET_STACK_NAME
+aws cloudformation wait stack-create-complete --stack-name $BUCKET_STACK_NAME
+
+export S3_BUCKET_NAME=$(aws cloudformation describe-stacks \
+  --stack-name $BUCKET_STACK_NAME \
+  --output text \
+  --query Stacks[0].Outputs[0].OutputValue \
+  )
+
 echo 'bucket to hold template is created:'
-
-export S3_BUCKET_NAME=2ndwatch-datalake-template-for-486567699039
-
-#$(aws cloudformation describe-stacks \
-#  --stack-name $BUCKET_STACK_NAME \
-#  --output text \
-#  --query Stacks[0].Outputs[0].OutputValue \
-#  )
-
 echo $S3_BUCKET_NAME
 
 export S3_LOCATION='s3://'$S3_BUCKET_NAME;
