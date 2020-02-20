@@ -146,6 +146,7 @@ Resources:
 
   rRedshiftS3Role:
     Type: AWS::IAM::Role
+    Condition: cBuildRedshift
     Properties:
       RoleName: !Sub "${pProjectName}-RedshiftCluster-Role"
       Path: /
