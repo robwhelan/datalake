@@ -93,10 +93,7 @@ Resources:
       TablePrefix: 'drop_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pDropZoneBucket}/order_items/'
-          - Path: !Sub 's3://${pDropZoneBucket}/order_reviews/'
-          - Path: !Sub 's3://${pDropZoneBucket}/orders/'
-          - Path: !Sub 's3://${pDropZoneBucket}/sellers/'
+          - Path: !Sub 's3://${pDropZoneBucket}/'
   rGlueCrawlerRawZone:
     Type: AWS::Glue::Crawler
     Properties:
@@ -110,10 +107,7 @@ Resources:
       TablePrefix: 'analytics_' #generalize this
       Targets:
         S3Targets:
-          - Path: !Sub 's3://${pRawZoneBucket}/order_items/'
-          - Path: !Sub 's3://${pRawZoneBucket}/order_reviews/'
-          - Path: !Sub 's3://${pRawZoneBucket}/orders/'
-          - Path: !Sub 's3://${pRawZoneBucket}/sellers/'
+          - Path: !Sub 's3://${pRawZoneBucket}/'
   rGlueCrawlerCuratedZone:
     Type: AWS::Glue::Crawler
     Properties:

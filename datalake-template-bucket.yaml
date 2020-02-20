@@ -8,7 +8,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub '2ndwatch-datalake-template-for-${AWS::AccountId}'
+      BucketName: !Sub 'ians-datalake-template-for-${AWS::AccountId}'
       LifecycleConfiguration:
         Rules:
           - Status: Enabled
