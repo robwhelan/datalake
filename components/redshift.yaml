@@ -1,12 +1,10 @@
 # TODO
 # - Verify Tag Name hack works
-# - Outputs
 # - is parameter group necessary and if so, how to sanely configure or do we pass in
 # - snapshot config
 # - Maintenance window
 # - Logging properties
 # - Encrpytion (KMS, HSM, etc)
-# - Elastic IP Needed?
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Redshift infrastructure. Redshift 4-node cluster and .
@@ -48,7 +46,7 @@ Parameters:
 
   # Subnet
   pSubnetIds:
-    Type: List<Number>
+    Type: List<String>
 
   # Ingress
   pClusterIngressCIDR:
@@ -118,3 +116,12 @@ Resources:
       ClusterSecurityGroupName: !Ref rClusterSecurityGroup
       EC2SecurityGroupName: !Ref pClusterIngressSG
 
+
+
+Outputs:
+  oCluster: 
+    Value: !Ref rRedshiftCluster
+  oClusterEndpoint:
+    Value: !Sub
+      - "${address}:${port}"
+      - { address: !GetAtt rRedshiftCluster.Endpoint.Address, port: !GetAtt rRedshiftCluster.Endpoint.Port }

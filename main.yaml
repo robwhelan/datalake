@@ -14,6 +14,7 @@ Parameters:
     Type: String
     Description: S3 bucket name for datalake files.
 
+  # RedShift
   pBuildRedshift:
     Type: String
     Default: "false"
@@ -21,7 +22,34 @@ Parameters:
       - "true"
       - "false"
     Description: Choose whether to build a Redshift Cluster or not
-
+  pRsDBName:
+    Type: String
+    Default: "default"
+  pRsMasterUsername:
+    Type: String
+    Default: "admin"
+  pRsMasterUserPassword:
+    Type: String
+    Default: ""
+    NoEcho: True
+  pRsNodeType:
+    Type: String
+    Default: dc1.large
+  pRsNumberOfNodes:
+    Type: Number
+    Default: 4
+  pRsPort:
+    Type: Number
+    Default: 5439
+  pRsSubnetIds:
+    Type: List<String>
+  pRsClusterIngressCIDR:
+    Type: String
+    Default: '10.0.0.0/0'
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+  pRsClusterIngressSG:
+    Type: String
+    Default: ""
 
 Conditions:
   cBuildRedshift: !Equals
@@ -32,8 +60,6 @@ Conditions:
 Resources:
   rDropZone:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - rDeadLetterQueue
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
@@ -47,8 +73,6 @@ Resources:
 
   rRawZone:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - rDeadLetterQueue
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
@@ -62,8 +86,6 @@ Resources:
 
   rCuratedZone:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - rDeadLetterQueue
     Properties:
       Parameters:
         pDeadLetterQueueArn: !GetAtt rDeadLetterQueue.Outputs.rQueueArn
@@ -78,10 +100,6 @@ Resources:
   #main database for data catalog.
   rEtlPipeline:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - rDropZone
-      - rRawZone
-      - rCuratedZone
     Properties:
       Parameters:
         pProjectName: !Ref pProjectName
@@ -126,15 +144,57 @@ Resources:
   #other security, like macie
 
 
+  rRedshiftS3Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${pProjectName}-RedshiftCluster-Role"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - redshift.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${pProjectName}-RedshiftCluster-Policy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: !GetAtt rCuratedZone.Outputs.oS3Bucket
+                Action: 
+                 - s3:ListBucket
+              - Effect: Allow
+                Resource: !Sub
+                  - "${bucket}/*"
+                  - { bucket: !GetAtt rCuratedZone.Outputs.oS3Bucket }
+                Action:
+                  - s3:GetObject
+
   # TODO: Figure out a good timeout...redshift can take awhile
   rRedshiftCluster:
-    Type: AWS::Cloudformation::Stack
+    Type: AWS::CloudFormation::Stack
     Condition: cBuildRedshift
     Properties:
       TemplateURL: !Sub '${pS3TemplateLocation}/components/redshift.yaml'
       TimeoutInMinutes: 120
       Parameters:
         pProjectName: !Ref pProjectName
+        pClusterName: !Sub "${pProjectName}-RedshiftCluster"
+        pDBName: !Ref pRsDBName
+        pMasterUsername: !Ref pRsMasterUsername
+        pMasterUserPassword: !Ref pRsMasterUserPassword
+        pNodeType: !Ref pRsNodeType
+        pNumberOfNodes: !Ref pRsNumberOfNodes
+        pPort: !Ref pRsPort
+        pIamRoleArns: 
+          - !Ref rRedshiftS3Role
+        pSubnetIds: !Ref pRsSubnetIds
+        pClusterIngressCIDR: !Ref pRsClusterIngressCIDR
+        pClusterIngressSG: !Ref pRsClusterIngressSG
 
 
 Outputs:
